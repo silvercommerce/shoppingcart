@@ -1,29 +1,13 @@
 ---
-Name: orderconfig
+Name: shoppingcartconfig
 ---
-LeftAndMain:
-  extra_requirements_css:
-    - orders/css/admin.css
-
 ## Extensions
 Controller:
   extensions:
-    - OrdersControllerExtension
+    - ControllerExtension
 SiteConfig:
   extensions:
-    - OrdersSiteConfigExtension
-Member:
-  extensions:
-    - OrdersMemberExtension
+    - SiteConfigExtension
 Group:
   extensions:
-    - OrdersGroupExtension
-Order:
-  extensions:
-    - Payable
-Payment:
-  extensions:
-    - OrdersPaymentExtension
-Users_Register_Controller:
-  extensions:
-    - OrdersUsers_Register_ControllerExtension
+    - GroupExtension
