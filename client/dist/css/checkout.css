@@ -1,4 +1,4 @@
-/* Shopping Cart Items
+/* Cart Items
 ----------------------------------------- */
 .checkout-cart form,
 .checkout-cart .checkout-cart-items table {
@@ -39,7 +39,7 @@
         display: none;
     }
 
-/* Shopping Cart Total
+/* Cart Total
 ----------------------------------------- */
 .checkout-cart .checkout-total-table {
     width: 100%;
@@ -55,47 +55,7 @@
         padding: 0.5em 0.25em;
     }
 
-/* Checkout
----------------------------------------- */
-.checkout-checkout form {
-    width: auto;
-    max-width: none;
-}
-
-/* Checkout Login Form
----------------------------------------- */
-#CheckoutLoginForm_LoginForm {
-    position: relative;
-}
-#CheckoutLoginForm_LoginForm:after {
-    content: "";
-    display: table;
-    clear: both;
-}
-    #CheckoutLoginForm_LoginForm_action_dologin {
-        float: right;
-        margin-left: 3em;
-    }
-    #CheckoutLoginForm_LoginForm #ForgotPassword {
-        float: left;
-        line-height: 2.5em;
-    }
-    @media screen and (max-width: 480px) {
-        #CheckoutLoginForm_LoginForm_action_dologin,
-        #CheckoutLoginForm_LoginForm #ForgotPassword {
-            float: left;
-            margin-right: 2em;
-        }
-    }
-
-/* Checkout Order Summary
---------------------------------------- */
-.checkout-checkout .checkout-order-summary .total {
-    text-align: center;
-    font-size: 2em;
-}
-
-/* Proceed Button
+/* Cart Proceed Button
 --------------------------------------------------------------------- */
 .checkout-cart-proceed .btn {
     display: block;
