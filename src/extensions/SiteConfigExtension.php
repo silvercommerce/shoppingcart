@@ -18,11 +18,14 @@ class SiteConfigExtension extends DataExtension
     
     private static $db = array(
         "EnableClickAndCollect" => "Boolean",
+        "ShowPriceAndTax" => "Boolean",
         'LastEstimateClean' => 'SS_DateTime'
     );
     
     public function updateCMSFields(FieldList $fields)
     {
+        $fields->removeByName("LastEstimateClean");
+        
         $misc_fields = $fields->findByName("MiscFields");
 
         if (!$misc_fields) {
@@ -37,6 +40,11 @@ class SiteConfigExtension extends DataExtension
                 $misc_fields
             );
         }
+
+        $misc_fields->push(CheckboxField::create(
+            "ShowPriceAndTax",
+            $this->owner->fieldLabel("ShowPriceAndTax")
+        ));
 
         $misc_fields->push(CheckboxField::create(
             "EnableClickAndCollect",
