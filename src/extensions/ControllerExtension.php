@@ -1,6 +1,6 @@
 <?php
 
-namespace SilverCommerce\ShoppingCart;
+namespace SilverCommerce\ShoppingCart\Extensions;
 
 use SilverStripe\Core\Extension;
 use SilverCommerce\ShoppingCart\Control\ShoppingCart;

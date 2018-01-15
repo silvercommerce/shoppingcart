@@ -1,6 +1,6 @@
 <?php
 
-namespace SilverCommerce\ShoppingCart;
+namespace SilverCommerce\ShoppingCart\Extensions;
 
 use SilverStripe\ORM\DataExtension;
 use SilverStripe\Forms\FieldList;
