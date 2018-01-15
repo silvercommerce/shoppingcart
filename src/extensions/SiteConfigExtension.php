@@ -19,7 +19,7 @@ class SiteConfigExtension extends DataExtension
     private static $db = array(
         "EnableClickAndCollect" => "Boolean",
         "ShowPriceAndTax" => "Boolean",
-        'LastEstimateClean' => 'SS_DateTime'
+        'LastEstimateClean' => 'DBDatetime'
     );
     
     public function updateCMSFields(FieldList $fields)

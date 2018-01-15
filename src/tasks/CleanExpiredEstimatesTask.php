@@ -1,24 +1,36 @@
 <?php
 
-class CleanExpiredEstimatesTask extends BuildTask {
- 
+namespace SilverCommerce\ShoppingCart\Tasks;
+
+use SilverStripe\Dev\BuildTask;
+use SilverStripe\Control\Director;
+use SilverCommerce\OrdersAdmin\Model\Estimate;
+use DateTime;
+
+/**
+ * Simple task that removes estimates that have passed their end date
+ * and are not assigned to a customer.
+ * 
+ * @author ilateral (http://www.ilateral.co.uk)
+ * @package shoppingcart
+ */
+class CleanExpiredEstimatesTask extends BuildTask
+{
     protected $title = 'Clean expired estimates';
- 
+
     protected $description = 'Clean all estimates that are past their expiration date and have no users assifgned';
- 
+
     protected $enabled = true;
 
-        /**
-     * Undocumented variable
+    /**
+     * Should this task output commands 
      *
      * @var boolean
      */
     protected $silent = false;
 
     /**
-     * Undocumented function
-     *
-     * @return void
+     * @return boolean
      */
     public function getSilent()
     {
@@ -29,7 +41,7 @@ class CleanExpiredEstimatesTask extends BuildTask {
      * set the silent parameter
      *
      * @param boolean $set
-     * @return FetchRSSTask
+     * @return CleanExpiredEstimatesTask
      */
     public function setSilent($set)
     {
@@ -43,7 +55,7 @@ class CleanExpiredEstimatesTask extends BuildTask {
         $past = $now->modify("-{$days} days");
 
         $estimates = Estimate::get()->filter([
-            'Cart' => true,
+            'ShoppingCart' => true,
             "Date:LessThan" => $past->format('Y-m-d H:i:s')
         ]);
 
