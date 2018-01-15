@@ -11,3 +11,6 @@ SilverStripe\SiteConfig\SiteConfig:
 SilverStripe\Security\Group:
   extensions:
     - SilverCommerce\ShoppingCart\Extensions\GroupExtension
+SilverCommerce\OrdersAdmin\Model\Estimate:
+  extensions:
+    - SilverCommerce\ShoppingCart\Extensions\EstimateExtension

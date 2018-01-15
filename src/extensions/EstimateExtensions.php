@@ -11,9 +11,9 @@ use SilverCommerce\ShoppingCart\Control\ShoppingCart;
  * @author i-lateral (http://www.i-lateral.com)
  * @package shoppingcart
  */
-class GroupExtension extends DataExtension
+class EstimateExtension extends DataExtension
 {
-    private static $belongs_many_many = array(
-        "Discounts" => "Discount"
-    );
+    private static $db = [
+        "ShoppingCart" => "Boolean"
+    ];
 }
