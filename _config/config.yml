@@ -2,12 +2,12 @@
 Name: shoppingcartconfig
 ---
 ## Extensions
-Controller:
+SilverStripe\Control\Controller:
   extensions:
-    - ControllerExtension
-SiteConfig:
+    - SilverCommerce\ShoppingCart\Extensions\ControllerExtension
+SilverStripe\SiteConfig\SiteConfig:
   extensions:
-    - SiteConfigExtension
-Group:
+    - SilverCommerce\ShoppingCart\Extensions\SiteConfigExtension
+SilverStripe\Security\Group:
   extensions:
-    - GroupExtension
+    - SilverCommerce\ShoppingCart\Extensions\GroupExtension
