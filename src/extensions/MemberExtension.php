@@ -27,4 +27,20 @@ class MemberExtension extends DataExtension
             ->filter("ShoppingCart", 1)
             ->first();
     }
+
+    /**
+     * Get a discount from the groups this member is in
+     *
+     * @return Discount
+     */
+    public function getDiscount() {
+        $discounts = ArrayList::create();
+        foreach($this->owner->Groups() as $group) {
+            foreach($group->Discounts() as $discount) {
+                $discounts->add($discount);
+            }
+        }
+        $discounts->sort("Amount", "DESC");
+        return $discounts->first();
+    }
 }
