@@ -28,7 +28,7 @@
       },
       "require": {
           "silverstripe/framework": "~4.0",
-          "silvercomerce/orders-admin": "1.*@dev"
+          "silvercommerce/orders-admin": "1.*@dev"
       },
       "suggest": {
           "silverstripe/cms": "Add full content management support to your site",
