@@ -517,7 +517,7 @@ class ShoppingCart extends Controller
      */
     public function getViewCartButton()
     {
-        return $this->renderWith('ViewCartButton');
+        return $this->renderWith('SilverCommerce\ShoppingCart\Includes\ViewCartButton');
     }
 
     /**
