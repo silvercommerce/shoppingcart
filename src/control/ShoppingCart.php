@@ -21,6 +21,7 @@ use SilverStripe\Forms\OptionsetField;
 use SilverStripe\Forms\RequiredFields;
 use SilverStripe\SiteConfig\SiteConfig;
 use SilverStripe\Control\HTTPRequest;
+use SilverStripe\CMS\Controllers\ContentController;
 use SilverCommerce\OrdersAdmin\Model\Estimate;
 use SilverCommerce\OrdersAdmin\Model\LineItem;
 use SilverCommerce\OrdersAdmin\Model\Discount;
@@ -517,6 +518,24 @@ class ShoppingCart extends Controller
     public function getViewCartButton()
     {
         return $this->renderWith('ViewCartButton');
+    }
+
+    /**
+     * If content controller exists, return it's menu function
+     * @param int $level Menu level to return.
+     * @return ArrayList
+     */
+    public function getMenu($level = 1)
+    {
+        if (class_exists(ContentController::class)) {
+            $controller = ContentController::singleton();
+            return $controller->getMenu($level);
+        }
+    }
+
+    public function Menu($level)
+    {
+        return $this->getMenu();
     }
 
     public function init()
