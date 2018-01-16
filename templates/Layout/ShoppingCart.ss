@@ -1,4 +1,4 @@
-<% require css('checkout/css/checkout.css') %>
+<% require css('silvercommerce/shoppingcart: client/dist/css/shoppingcart.css') %>
 
 <div class="content-container container typography checkout-cart">
     <h1><%t Checkout.CartName 'Shopping Cart' %></h1>

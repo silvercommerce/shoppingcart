@@ -55,8 +55,8 @@ class CleanExpiredEstimatesTask extends BuildTask
         $past = $now->modify("-{$days} days");
 
         $estimates = Estimate::get()->filter([
-            'ShoppingCart' => true,
-            "Date:LessThan" => $past->format('Y-m-d H:i:s')
+            "ShoppingCart" => true,
+            "StartDate:LessThan" => $past->format('Y-m-d H:i:s')
         ]);
 
         $i = 0;

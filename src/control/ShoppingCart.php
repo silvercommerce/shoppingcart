@@ -26,7 +26,7 @@ use SilverCommerce\OrdersAdmin\Model\LineItem;
 use SilverCommerce\OrdersAdmin\Model\Discount;
 use SilverCommerce\OrdersAdmin\Model\PostageArea;
 use SilverCommerce\OrdersAdmin\Tools\ShippingCalculator;
-
+use SilverCommerce\ShoppingCart\Tasks\CleanExpiredEstimatesTask;
 
 /**
  * Holder for items in the shopping cart and interacting with them, as
@@ -191,6 +191,7 @@ class ShoppingCart extends Controller
     public function setEstimate($estimate)
     {
         $this->estimate = $estimate;
+        return $this;
     }
     
     public function getItems()
@@ -205,7 +206,8 @@ class ShoppingCart extends Controller
     
     public function setDiscount(Discount $discount)
     {
-        return $this->estimate->DiscountID = $discount->ID;
+        $this->estimate->DiscountID = $discount->ID;
+        return $this;
     }
 
     public function getPostage()
@@ -215,7 +217,8 @@ class ShoppingCart extends Controller
 
     public function setPostage(PostageArea $postage)
     {
-        return $this->estimate->PostageID = $postage->ID;
+        $this->estimate->PostageID = $postage->ID;
+        return $this;
     }
     
     /**
@@ -415,6 +418,7 @@ class ShoppingCart extends Controller
         if (!$estimate) {
             $estimate = $estimate_class::create();
             $estimate->Cart = true;
+            Debug::show($estimate);
             $write = true;
         }
 
@@ -475,7 +479,7 @@ class ShoppingCart extends Controller
         
         // If we don't have any discounts, a user is logged in and he has
         // access to discounts through a group, add the discount here
-        if (!$this->getDiscount()->exists() && $member && $member->getDiscount()) {
+        if (!$estimate->Discount()->exists() && $member && $member->getDiscount()) {
             $estimate->DiscountID = $member->getDiscount()->ID;
             $estimate->write();
         }
@@ -504,7 +508,7 @@ class ShoppingCart extends Controller
             $siteconfig = SiteConfig::current_site_config();
             $date = $siteconfig->dbobject("LastEstimateClean");
             if (!$date || ($date && !$date->IsToday())) {
-                $task = Injector::inst()->create('CleanExpiredEstimatesTask');
+                $task = Injector::inst()->create(CleanExpiredEstimatesTask::class);
                 $task->setSilent(true);
                 $task->run($this->getRequest());
                 $siteconfig->LastEstimateClean = DBDatetime::now()->Value;
