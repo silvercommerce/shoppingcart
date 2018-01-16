@@ -1,6 +1,6 @@
 <form $FormAttributes>
     <fieldset class="checkout-cart-items">
-        $Fields.dataFieldByName(SecurityID)
+		$Fields.dataFieldByName(SecurityID)
 		
 		<div class="table-responsive">
 			<table class="table table-hover">

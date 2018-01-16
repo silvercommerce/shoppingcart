@@ -568,7 +568,7 @@ class ShoppingCart extends Controller
                 $this->save();
                 
                 $form = $this->CartForm();
-                $form->sesionMessage(_t(
+                $form->sessionMessage(_t(
                     "ShoppingCart.RemovedItem",
                     "Removed '{title}' from your cart",
                     ["title" => $title]
@@ -591,7 +591,7 @@ class ShoppingCart extends Controller
         $this->clear();
         
         $form = $this->CartForm();
-        $form->sesionMessage(_t(
+        $form->sessionMessage(_t(
             "ShoppingCart.EmptiedCart",
             "Shopping cart emptied"
         ));
@@ -828,7 +828,7 @@ class ShoppingCart extends Controller
     }
     
     /**
-     * Clear the shopping cart object and destroy sesions/cookies
+     * Clear the shopping cart object and destroy sessions/cookies
      *
      */
     public function clear()
@@ -870,7 +870,7 @@ class ShoppingCart extends Controller
                     _t('ShoppingCart.UpdateCart', 'Update Cart')
                 )->addExtraClass('btn btn-info')
             )
-        )->setTemplate("ShoppingCartForm");
+        )->setTemplate("SilverCommerce\ShoppingCart\Forms\Includes\ShoppingCartForm");
         
         $this->extend("updateCartForm", $form);
         
