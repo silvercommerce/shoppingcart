@@ -3,6 +3,7 @@
 namespace SilverCommerce\ShoppingCart\Extensions;
 
 use SilverStripe\ORM\DataExtension;
+use SilverCommerce\OrdersAdmin\Model\Discount;
 use SilverCommerce\ShoppingCart\Control\ShoppingCart;
 
 /**
@@ -14,6 +15,6 @@ use SilverCommerce\ShoppingCart\Control\ShoppingCart;
 class GroupExtension extends DataExtension
 {
     private static $belongs_many_many = array(
-        "Discounts" => "Discount"
+        "Discounts" => Discount::class
     );
 }

@@ -3,6 +3,7 @@
 namespace SilverCommerce\ShoppingCart\Extensions;
 
 use SilverStripe\ORM\DataExtension;
+use SilverStripe\ORM\ArrayList;
 
 /**
  * Overwrite group object so we can setup default groups
@@ -22,7 +23,7 @@ class MemberExtension extends DataExtension
     {
         return $this
             ->owner
-            ->getContact()
+            ->Contact()
             ->Estimates()
             ->filter("ShoppingCart", 1)
             ->first();
@@ -35,12 +36,15 @@ class MemberExtension extends DataExtension
      */
     public function getDiscount() {
         $discounts = ArrayList::create();
+
         foreach($this->owner->Groups() as $group) {
             foreach($group->Discounts() as $discount) {
                 $discounts->add($discount);
             }
         }
+
         $discounts->sort("Amount", "DESC");
+
         return $discounts->first();
     }
 }

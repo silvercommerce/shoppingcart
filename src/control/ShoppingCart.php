@@ -4,7 +4,6 @@ namespace SilverCommerce\ShoppingCart\Control;
 
 use SilverStripe\Control\Controller;
 use SilverStripe\Control\Director;
-use SilverStripe\Control\Session;
 use SilverStripe\Control\Cookie;
 use SilverStripe\Security\Member;
 use SilverStripe\ORM\ArrayList;
@@ -21,6 +20,7 @@ use SilverStripe\Forms\DropdownField;
 use SilverStripe\Forms\OptionsetField;
 use SilverStripe\Forms\RequiredFields;
 use SilverStripe\SiteConfig\SiteConfig;
+use SilverStripe\Control\HTTPRequest;
 use SilverCommerce\OrdersAdmin\Model\Estimate;
 use SilverCommerce\OrdersAdmin\Model\LineItem;
 use SilverCommerce\OrdersAdmin\Model\Discount;
@@ -261,6 +261,12 @@ class ShoppingCart extends Controller
         );
     }
 
+    public function getSession()
+    {
+        $request = Injector::inst()->get(HTTPRequest::class);
+        return $request->getSession();
+    }
+
     /**
      * Get any postage items that have been set
      *
@@ -268,7 +274,8 @@ class ShoppingCart extends Controller
      */
     public function getAvailablePostage()
     {
-        $postage = Session::get("ShoppingCart.AvailablePostage");
+        $session = $this->getSession();
+        $postage = $session->get("ShoppingCart.AvailablePostage");
 
         if (!$postage) {
             $postage = ArrayList::create();
@@ -287,6 +294,7 @@ class ShoppingCart extends Controller
      */
     public function setAvailablePostage($country, $code)
     {
+        $session = $this->getSession();
         $postage_areas = new ShippingCalculator($code, $country);
 
         $postage_areas
@@ -298,16 +306,16 @@ class ShoppingCart extends Controller
 
         $this->extend('updateAvailablePostage',$postage_areas);
 
-        Session::set("ShoppingCart.AvailablePostage", $postage_areas);
+        $session->set("ShoppingCart.AvailablePostage", $postage_areas);
 
         // If current postage is not available, clear it.
-        $postage_id = Session::get("ShoppingCart.PostageID");
+        $postage_id = $session->get("ShoppingCart.PostageID");
 
         if (!$postage_areas->find("ID", $postage_id)) {
             if ($postage_areas->exists()) {
-                Session::set("ShoppingCart.PostageID", $postage_areas->first()->ID);
+                $session->set("ShoppingCart.PostageID", $postage_areas->first()->ID);
             } else {
-                Session::clear("ShoppingCart.PostageID");
+                $session->clear("ShoppingCart.PostageID");
             }
         }
 
@@ -324,9 +332,10 @@ class ShoppingCart extends Controller
     public function isCollection()
     {
         $config = SiteConfig::current_site_config();
+        $session = $this->getSession();
 
         if ($config->EnableClickAndCollext) {
-            $type = Session::get("ShoppingCart.Delivery");
+            $type = $session->get("ShoppingCart.Delivery");
             return ($type == self::COLLECTION) ? true : false;
         } else {
             return false;
@@ -377,7 +386,7 @@ class ShoppingCart extends Controller
      */
     public static function get()
     {
-        return ShoppingCart::create();
+        return Injector::inst()->create(ShoppingCart::class);
     }
     
     /**
@@ -637,9 +646,10 @@ class ShoppingCart extends Controller
     public function setdeliverytype()
     {
         $type = $this->request->param("ID");
+        $session = $this->getSession();
         
         if ($type && in_array($type, [self::COLLECTION, self::DELIVERY])) {
-            Session::set("ShoppingCart.Delivery", $type);
+            $session->set("ShoppingCart.Delivery", $type);
             $this->getEstimate()->PostageID = 0;
             $this->save();
         }
@@ -675,7 +685,7 @@ class ShoppingCart extends Controller
         }
 
         if (!is_array($customisations)) {
-            $customisations[$customisations];
+            $customisations = [$customisations];
         }
 
         // Start off by writing our item object (if it is
@@ -684,7 +694,7 @@ class ShoppingCart extends Controller
             $item->write();
         }
 
-        foreach($customisations as $customisations) {
+        foreach($customisations as $customisation) {
             $item->Customisations()->add($customisation);
         }
 
@@ -796,9 +806,10 @@ class ShoppingCart extends Controller
         $member = Member::currentUser();
         $contact = $member->Contact();
         $estimate = $this->getEstimate();
+        $session = $this->getSession();
         
         // Update available postage (or clear any set if not deliverable)
-        $data = Session::get("Form.Form_PostageForm.data");
+        $data = $session->get("Form.Form_PostageForm.data");
         if ($data && is_array($data) && $this->isDeliverable()) {
             $country = $data["Country"];
             $code = $data["ZipCode"];
@@ -906,6 +917,7 @@ class ShoppingCart extends Controller
     {
         if ($this->isDeliverable()) {
             $available_postage = $this->getAvailablePostage();
+            $session = $this->getSession();
             
             // Setup form
             $form = Form::create(
@@ -962,14 +974,14 @@ class ShoppingCart extends Controller
             }
             
             // Check if the form has been re-posted and load data
-            $data = Session::get("Form.{$form->FormName()}.data");
+            $data = $session->get("Form.{$form->FormName()}.data");
             if (is_array($data)) {
                 $form->loadDataFrom($data);
             }
             
             // Check if the postage area has been set, if so, Set Postage ID
             $data = array();
-            $data["PostageID"] = Session::get("Checkout.PostageID");
+            $data["PostageID"] = $session->get("Checkout.PostageID");
             if (is_array($data)) {
                 $form->loadDataFrom($data);
             }
@@ -1060,6 +1072,7 @@ class ShoppingCart extends Controller
      */
     public function doSetPostage($data, $form)
     {
+        $session = $this->getSession();
         $country = $data["Country"];
         $code = $data["ZipCode"];
         
@@ -1087,7 +1100,7 @@ class ShoppingCart extends Controller
         }
 
         // Set the form pre-populate data before redirecting
-        Session::set("Form.{$form->FormName()}.data", $data);
+        $session->set("Form.{$form->FormName()}.data", $data);
         
         $url = Controller::join_links(
             $this->Link(),

@@ -16,11 +16,11 @@ use SilverStripe\Forms\CheckboxField;
 class SiteConfigExtension extends DataExtension
 {
     
-    private static $db = array(
+    private static $db = [
         "EnableClickAndCollect" => "Boolean",
         "ShowPriceAndTax" => "Boolean",
         'LastEstimateClean' => 'DBDatetime'
-    );
+    ];
     
     public function updateCMSFields(FieldList $fields)
     {
