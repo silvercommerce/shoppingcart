@@ -1,19 +1,20 @@
 <form $FormAttributes>
     <fieldset class="checkout-cart-items">
         $Fields.dataFieldByName(SecurityID)
+		
 		<div class="table-responsive">
 			<table class="table table-hover">
 				<thead>
 					<tr>
 						<th class="image"></th>
 						<th class="description">
-							<%t Checkout.Description "Description" %>
+							<%t ShoppingCart.Description "Description" %>
 						</th>
 						<th class="quantity">
-							<%t Checkout.Qty "Qty" %>
+							<%t ShoppingCart.Qty "Qty" %>
 						</th>
 						<th class="price">
-							<%t Checkout.Price "Price" %>
+							<%t ShoppingCart.Price "Price" %>
 						</th>
 						<th class="actions"></th>
 					</tr>
@@ -44,7 +45,7 @@
 									name="Quantity_{$Key}"
 									value="{$Quantity}"
 									<% if $Locked %>
-									title="<%t Checkout.ItemCannotBeEdited "This item cannot be edited" %>"
+									title="<%t ShoppingCart.ItemCannotBeEdited "This item cannot be edited" %>"
 									readonly
 									<% end_if %>
 								/>
@@ -67,7 +68,7 @@
     <fieldset class="checkout-cart-actions Actions row">
 		<div class="btn-group pull-right">
 			<a href="$Controller.Link('emptycart')" class="btn btn-red btn-danger">
-				<%t Checkout.CartEmpty "Empty Cart" %>
+				<%t ShoppingCart.CartEmpty "Empty Cart" %>
 			</a>
 			
 			$Actions.dataFieldByName(action_doUpdate).Field

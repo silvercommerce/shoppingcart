@@ -69,6 +69,16 @@ class ShoppingCart extends Controller
     private static $class_name = "ShoppingCart";
 
     /**
+     * Setup default templates for this controller
+     *
+     * @var array
+     */
+    protected $templates = [
+        "index" => [ShoppingCart::class, "Page"],
+        "usediscount" => [ShoppingCart::class . "_usediscount", ShoppingCart::class, "Page"]
+    ];
+
+    /**
      * flag for collection
      *
      * @var string
@@ -533,11 +543,8 @@ class ShoppingCart extends Controller
     public function index()
     {
         $this->extend("onBeforeIndex");
-        
-        return $this->renderWith([
-            'ShoppingCart',
-            'Page'
-        ]);
+
+        return $this->render();
     }
     
     /**
@@ -630,11 +637,7 @@ class ShoppingCart extends Controller
         return $this
             ->customise([
                 "Discount" => $code
-            ])->renderWith(array(
-                'ShoppingCart_discount',
-                'Checkout',
-                'Page'
-            ));
+            ])->render();
     }
     
     
