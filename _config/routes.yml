@@ -1,7 +1,6 @@
 ---
 Name: shoppingcartroutes
-After: framework/routes#rootroutes
 ---
-Director:
+SilverStripe\Control\Director:
   rules:
-    'shoppingcart//$Action/$ID/$Quantity': 'ShoppingCart'
+    'shoppingcart//$Action/$ID/$Quantity': 'SilverCommerce\ShoppingCart\Control\ShoppingCart'
