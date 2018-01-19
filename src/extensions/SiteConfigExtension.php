@@ -26,7 +26,7 @@ class SiteConfigExtension extends DataExtension
     {
         $fields->removeByName("LastEstimateClean");
         
-        $misc_fields = $fields->findByName("MiscFields");
+        $misc_fields = $fields->fieldByName("MiscFields");
 
         if (!$misc_fields) {
             $misc_fields = ToggleCompositeField::create(
