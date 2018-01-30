@@ -825,8 +825,6 @@ class ShoppingCart extends Controller
         // Extend our save operation
         $this->extend("onBeforeSave");
         
-        $member = Member::currentUser();
-        $contact = $member->Contact();
         $estimate = $this->getEstimate();
         $session = $this->getSession();
         
