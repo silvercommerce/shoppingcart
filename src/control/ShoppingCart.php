@@ -39,19 +39,6 @@ use SilverCommerce\ShoppingCart\Tasks\CleanExpiredEstimatesTask;
  */
 class ShoppingCart extends Controller
 {
-    /**
-     * Specifies the flag for collection 
-     *
-     * @var string
-     */
-    const COLLECTION = 'collect';
-
-    /**
-     * Specifiec the flag for delivery
-     *
-     * @var string
-     */
-    const DELIVERY = 'deliver';
 
     /**
      * URL Used to access this controller
@@ -78,14 +65,6 @@ class ShoppingCart extends Controller
         "index" => [ShoppingCart::class, "Page"],
         "usediscount" => [ShoppingCart::class . "_usediscount", ShoppingCart::class, "Page"]
     ];
-
-    /**
-     * flag for collection
-     *
-     * @var string
-     * @config
-     */
-    private static $collection = "collect";
     
     /**
      * Overwrite the default title for this controller which is taken
@@ -338,16 +317,14 @@ class ShoppingCart extends Controller
      * disabled then this returns false, otherwise checks if the user
      * has set this via a session.
      *
-     * @return Boolean
+     * @return boolean
      */
     public function isCollection()
     {
         $config = SiteConfig::current_site_config();
-        $session = $this->getSession();
 
-        if ($config->EnableClickAndCollext) {
-            $type = $session->get("ShoppingCart.Delivery");
-            return ($type == self::COLLECTION) ? true : false;
+        if ($config->EnableClickAndCollect) {
+            return $this->estimate->isCollection();
         } else {
             return false;
         }
@@ -358,25 +335,17 @@ class ShoppingCart extends Controller
      * This is used to determine setting and usage of delivery and
      * postage options in the checkout.
      *
-     * @return Boolean
+     * @return boolean
      */
     public function isDeliverable()
     {
-        $deliverable = false;
-        
-        foreach ($this->getItems() as $item) {
-            if ($item->Deliverable) {
-                $deliverable = true;
-            }
-        }
-        
-        return $deliverable;
+        return $this->estimate->isDeliverable();
     }
     
     /**
      * Determine if the current cart contains only locked items.
      *
-     * @return Boolean
+     * @return boolean
      */
     public function isLocked()
     {
@@ -668,11 +637,12 @@ class ShoppingCart extends Controller
     public function setdeliverytype()
     {
         $type = $this->request->param("ID");
-        $session = $this->getSession();
-        
-        if ($type && in_array($type, [self::COLLECTION, self::DELIVERY])) {
-            $session->set("ShoppingCart.Delivery", $type);
-            $this->getEstimate()->PostageID = 0;
+        $actions = array_keys(Estimate::config()->get("actions"));
+
+        if ($type && in_array($type, $actions)) {
+            $estimate = $this->getEstimate();
+            $estimate->Action = $type;
+            $estimate->PostageID = 0;
             $this->save();
         }
         

@@ -31,7 +31,7 @@
                                 </h3>
                                 
                                 <div class="checkout-delivery-buttons">
-                                    <a class="btn btn-primary<% if not $isCollection %> btn-active active<% end_if %> width-100" href="{$Link(setdeliverytype)}/deliver">
+                                    <a class="btn btn-primary<% if not $isCollection %> btn-active active<% end_if %> width-100" href="{$Link(setdeliverytype)}/post">
                                         <%t ShoppingCart.Delivered "Delivered" %>
                                     </a>
                                     <a class="btn btn-primary<% if $isCollection %> btn-active active<% end_if %> width-100" href="{$Link(setdeliverytype)}/collect">
