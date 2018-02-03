@@ -407,7 +407,6 @@ class ShoppingCart extends Controller
         if (!$estimate) {
             $estimate = $estimate_class::create();
             $estimate->Cart = true;
-            Debug::show($estimate);
             $write = true;
         }
 
