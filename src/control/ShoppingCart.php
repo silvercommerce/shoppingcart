@@ -28,6 +28,7 @@ use SilverCommerce\OrdersAdmin\Model\Discount;
 use SilverCommerce\OrdersAdmin\Model\PostageArea;
 use SilverCommerce\OrdersAdmin\Tools\ShippingCalculator;
 use SilverCommerce\ShoppingCart\Tasks\CleanExpiredEstimatesTask;
+use SilverCommerce\Checkout\Control\Checkout;
 
 /**
  * Holder for items in the shopping cart and interacting with them, as
@@ -84,6 +85,15 @@ class ShoppingCart extends Controller
      * @config
      */
     private static $estimate_class = Estimate::class;
+
+    /**
+     * Class Name of object we use as an assotiated estimate.
+     * This defaults to Estimate
+     *
+     * @var string
+     * @config
+     */
+    private static $checkout_class = Checkout::class;
     
     /**
      * Class Name of item we add to the shopping cart/an estimate.
@@ -144,6 +154,7 @@ class ShoppingCart extends Controller
         "update",
         "usediscount",
         "setdeliverytype",
+        "checkout",
         "CartForm",
         "PostageForm",
         "DiscountForm"
@@ -824,6 +835,27 @@ class ShoppingCart extends Controller
         $estimate->PostageID = 0;
         $estimate->DiscountID = 0;
         $this->save();
+    }
+
+    /**
+     * Setup the checkout and redirect to it
+     *
+     * @return Redirect
+     */
+    public function checkout()
+    {
+        if (!class_exists($this->config()->checkout_class)) {
+            return $this->httpError(404);
+        }
+
+        $estimate = $this->getEstimate();
+        $checkout = Injector::inst()
+            ->get($this->config()->checkout_class);
+        $checkout->setEstimate($estimate);
+
+        $this->extend("onBeforeCheckout");
+        
+        $this->redirect($checkout->Link());
     }
     
     /**
