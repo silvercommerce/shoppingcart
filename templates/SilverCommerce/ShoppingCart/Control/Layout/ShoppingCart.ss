@@ -24,7 +24,7 @@
 
                 <% if isDeliverable %>
                     <div class="units-row row line">
-                        <% if $ClickAndCollect %>
+                        <% if $SiteConfig.EnableClickAndCollect %>
                             <div class="unit-50 size10f2 col-xs-12 col-sm-6 checkout-cart-clickandcollect">
                                 <h3>
                                     <%t ShoppingCart.ReceiveGoods "How would you like to receive your goods?" %>
@@ -119,7 +119,7 @@
                     </table>
                     
                     <p class="checkout-cart-proceed line units-row end">
-                        <a href="{$BaseHref}checkout/checkout" class="btn btn-green btn-big btn-lg btn-success">
+                        <a href="{$Up.Link('checkout')}" class="btn btn-green btn-big btn-lg btn-success">
                             <%t ShoppingCart.CartProceed 'Proceed to Checkout' %>
                         </a>
                     </p>
