@@ -6,6 +6,7 @@ use SilverStripe\Control\Controller;
 use SilverStripe\Control\Director;
 use SilverStripe\Control\Cookie;
 use SilverStripe\Security\Member;
+use SilverStripe\Security\Security;
 use SilverStripe\ORM\ArrayList;
 use SilverStripe\ORM\ValidationResult;
 use SilverStripe\ORM\FieldType\DBDatetime;
@@ -370,14 +371,21 @@ class ShoppingCart extends Controller
     }
 
     /**
-     * Shortcut for ShoppingCart::create, exists because create()
-     * doesn't seem quite right.
+     * Get an instance of and intialise the
+     * shopping cart.
      *
      * @return ShoppingCart
      */
     public static function get()
     {
-        return Injector::inst()->create(ShoppingCart::class);
+        $cart = Injector::inst()
+            ->create(ShoppingCart::class);
+        
+        $cart->extend("onBeforeInit");
+        $cart->init();
+        $cart->extend("onAfterInit");
+
+        return $cart;
     }
     
     /**
@@ -387,11 +395,11 @@ class ShoppingCart extends Controller
      * push these items into a saved estimate.
      *
      */
-    public function __construct()
+    public function init()
     {
-        parent::__construct();
+        parent::init();
 
-        $member = Member::currentUser();
+        $member = Security::getCurrentUser();
         $contact = null;
         $estimate_class = self::config()->estimate_class;
         $estimate_id = Cookie::get('ShoppingCart.EstimateID');
@@ -405,11 +413,11 @@ class ShoppingCart extends Controller
         // If the current member doesn't have a cart, set one
         // up, else get their estimate or create a blank one
         // (if no member).
-        if ($member && !$member->getCart() && !$estimate_id) {
+        if (!empty($member) && !$member->getCart() && !$estimate_id) {
             $estimate = $estimate_class::create();
             $estimate->ShoppingCart = true;
             $write = true;
-        } elseif ($member && $member->getCart()) {
+        } elseif (!empty($member) && $member->getCart()) {
             $estimate = $member->getCart();
         } elseif ($estimate_id) {
             $estimate = $estimate_class::get()->byID($estimate_id);
@@ -433,6 +441,7 @@ class ShoppingCart extends Controller
         // Get any saved items from a session
         if ($estimate_id && $estimate_id != $estimate->ID) {
             $old_est = $estimate_class::get()->byID($estimate_id);
+            
             if ($old_est) {
                 $items = $old_est->Items();
 
@@ -467,6 +476,7 @@ class ShoppingCart extends Controller
 
                 $old_est->delete();
                 Cookie::force_expiry('ShoppingCart.EstimateID');
+                Cookie::force_expiry('ShoppingCart_EstimateID');
             }
 
         }
@@ -484,9 +494,18 @@ class ShoppingCart extends Controller
         }
 
         $this->setEstimate($estimate);
-        
-        // Allow extension of the shopping cart after initial setup
-        $this->extend("augmentSetup");
+
+        if (!$this->config()->cron_cleaner) {
+            $siteconfig = SiteConfig::current_site_config();
+            $date = $siteconfig->dbobject("LastEstimateClean");
+            if (!$date || ($date && !$date->IsToday())) {
+                $task = Injector::inst()->create(CleanExpiredEstimatesTask::class);
+                $task->setSilent(true);
+                $task->run($this->getRequest());
+                $siteconfig->LastEstimateClean = DBDatetime::now()->Value;
+                $siteconfig->write();
+            }
+        }
     }
     
     /**
@@ -516,24 +535,6 @@ class ShoppingCart extends Controller
     {
         return $this->getMenu();
     }
-
-    public function init()
-    {
-        parent::init();
-
-        if (!$this->config()->cron_cleaner) {
-            $siteconfig = SiteConfig::current_site_config();
-            $date = $siteconfig->dbobject("LastEstimateClean");
-            if (!$date || ($date && !$date->IsToday())) {
-                $task = Injector::inst()->create(CleanExpiredEstimatesTask::class);
-                $task->setSilent(true);
-                $task->run($this->getRequest());
-                $siteconfig->LastEstimateClean = DBDatetime::now()->Value;
-                $siteconfig->write();
-            }
-        }
-    }
-
     
     /**
      * Default acton for the shopping cart
