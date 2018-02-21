@@ -429,7 +429,7 @@ class ShoppingCart extends Controller
             $write = true;
         }
 
-        if ($contact && $estimate->CustomerID != $contact->ID) {
+        if (!empty($contact) && $contact->exists() && $estimate->CustomerID != $contact->ID) {
             $estimate->CustomerID = $contact->ID;
             $write = true;
         }
