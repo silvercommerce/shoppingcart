@@ -18,7 +18,6 @@ class SiteConfigExtension extends DataExtension
     
     private static $db = [
         "EnableClickAndCollect" => "Boolean",
-        "ShowPriceAndTax" => "Boolean",
         'LastEstimateClean' => 'DBDatetime'
     ];
     

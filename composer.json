@@ -28,6 +28,7 @@
       },
       "require": {
           "silverstripe/framework": "~4.0",
+          "silvercommerce/settings": "~1.0",
           "silvercommerce/orders-admin": "1.*@dev"
       },
       "suggest": {
