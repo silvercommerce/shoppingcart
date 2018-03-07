@@ -1,5 +1,5 @@
 <form $FormAttributes>
-    <fieldset class="checkout-cart-items">
+    <fieldset class="shoppingcart-items">
 		$Fields.dataFieldByName(SecurityID)
 		
 		<div class="table-responsive">
@@ -16,6 +16,11 @@
 						<th class="price">
 							<%t ShoppingCart.Price "Price" %>
 						</th>
+						<% if not $SiteConfig.ShowPriceAndTax %>
+							<th class="tax">
+								<%t ShoppingCart.Tax "Tax" %>
+							</th>
+						<% end_if %>
 						<th class="actions"></th>
 					</tr>
 				</thead>
@@ -51,8 +56,17 @@
 								/>
 							</td>
 							<td class="price">
-								{$UnitPrice.Nice}
+								<% if $Up.SiteConfig.ShowPriceAndTax %>
+									{$UnitTotal.Nice}
+								<% else %>
+									{$UnitPrice.Nice}
+								<% end_if %>
 							</td>
+							<% if not $Up.SiteConfig.ShowPriceAndTax %>
+								<td class="tax">
+									{$UnitTax.Nice}
+								</td>
+							<% end_if %>
 							<td class="remove">
 								<a href="{$Top.Controller.Link('remove')}/{$Key}" class="btn btn-red btn-danger">
 									x
@@ -65,8 +79,8 @@
 		</div>
     </fieldset>
 
-    <fieldset class="checkout-cart-actions Actions row">
-		<div class="btn-group pull-right">
+    <fieldset class="shoppingcart-actions Actions">
+		<div class="btn-group justify-content-end d-flex">
 			<a href="$Controller.Link('emptycart')" class="btn btn-red btn-danger">
 				<%t ShoppingCart.CartEmpty "Empty Cart" %>
 			</a>

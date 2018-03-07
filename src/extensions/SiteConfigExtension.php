@@ -18,36 +18,38 @@ class SiteConfigExtension extends DataExtension
     
     private static $db = [
         "EnableClickAndCollect" => "Boolean",
+        "ShowCartPostageForm" => "Boolean",
+        "ShowCartDiscountForm" => "Boolean",
         'LastEstimateClean' => 'DBDatetime'
     ];
     
     public function updateCMSFields(FieldList $fields)
     {
+        $fields->removeByName("EnableClickAndCollect");
+        $fields->removeByName("ShowCartPostageForm");
+        $fields->removeByName("ShowCartDiscountForm");
         $fields->removeByName("LastEstimateClean");
-        
-        $misc_fields = $fields->fieldByName("MiscFields");
 
-        if (!$misc_fields) {
-            $misc_fields = ToggleCompositeField::create(
-                'MiscSettings',
-                _t("ShoppingCart.MiscSettings", "Misc Settings"),
-                []
-            );
-
-            $fields->addFieldToTab(
-                "Root.Shop",
-                $misc_fields
-            );
-        }
-
-        $misc_fields->push(CheckboxField::create(
-            "ShowPriceAndTax",
-            $this->owner->fieldLabel("ShowPriceAndTax")
-        ));
-
-        $misc_fields->push(CheckboxField::create(
-            "EnableClickAndCollect",
-            $this->owner->fieldLabel("EnableClickAndCollect")
-        ));
+        $fields->addFieldToTab(
+            "Root.Shop",
+            ToggleCompositeField::create(
+                'ShoppingCartSettings',
+                _t("ShoppingCart.ShoppingCart", "Shopping Cart Settings"),
+                [
+                    CheckboxField::create(
+                        "ShowCartPostageForm",
+                        $this->owner->fieldLabel("ShowCartPostageForm")
+                    ),
+                    CheckboxField::create(
+                        "ShowCartDiscountForm",
+                        $this->owner->fieldLabel("ShowCartDiscountForm")
+                    ),
+                    CheckboxField::create(
+                        "EnableClickAndCollect",
+                        $this->owner->fieldLabel("EnableClickAndCollect")
+                    )
+                ]
+            )
+        );
     }
 }

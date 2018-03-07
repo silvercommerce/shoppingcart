@@ -1,47 +1,45 @@
 <% require css('silvercommerce/shoppingcart: client/dist/css/shoppingcart.css') %>
 
-<div class="content-container container typography checkout-cart">
+<div class="col-sm-12 content-container typography shoppingcart">
     <h1><%t ShoppingCart.CartName 'Shopping Cart' %></h1>
 
     <% if $Items.exists %>
-        <div class="checkout-cart-form">
+        <div class="shoppingcart-form">
             $CartForm
         </div>
 
         <hr/>
 
-        <div class="units-row row line">
-            <div class="unit-66 unit size2of3 col-xs-12 col-md-8">
-                <% if $ShowDiscountForm %>
+        <div class="row line">
+            <div class="unit size2of3 col-xs-12 col-md-8">
+                <% if $SiteConfig.ShowCartDiscountForm %>
                     <div class="checkout-cart-discounts line units-row end">
-                        <% if $ShowDiscountForm %>
-                            $DiscountForm
-                        <% end_if %>
+                        $DiscountForm
                     </div>
                     
                     <hr/>
                 <% end_if %>
 
                 <% if isDeliverable %>
-                    <div class="units-row row line">
+                    <div class="row line">
                         <% if $SiteConfig.EnableClickAndCollect %>
-                            <div class="unit-50 size10f2 col-xs-12 col-sm-6 checkout-cart-clickandcollect">
-                                <h3>
+                            <div class="size10f2 col-xs-12 col-sm-6 shoppingcart-clickandcollect">
+                                <p class="h4">
                                     <%t ShoppingCart.ReceiveGoods "How would you like to receive your goods?" %>
-                                </h3>
+                                </p>
                                 
-                                <div class="checkout-delivery-buttons">
-                                    <a class="btn btn-primary<% if not $isCollection %> btn-active active<% end_if %> width-100" href="{$Link(setdeliverytype)}/post">
+                                <div class="shoppingcart-delivery-buttons">
+                                    <a class="btn btn-secondary<% if not $isCollection %> btn-active active<% end_if %> width-100" href="{$Link(setdeliverytype)}/post">
                                         <%t ShoppingCart.Delivered "Delivered" %>
                                     </a>
-                                    <a class="btn btn-primary<% if $isCollection %> btn-active active<% end_if %> width-100" href="{$Link(setdeliverytype)}/collect">
+                                    <a class="btn btn-secondary<% if $isCollection %> btn-active active<% end_if %> width-100" href="{$Link(setdeliverytype)}/collect">
                                         <%t ShoppingCart.CollectInstore "Collect Instore" %>
                                     </a>
                                 </div>
                             </div>
                         <% end_if %>
                         
-                        <% if $PostageForm && not $isCollection %>
+                        <% if not $isCollection && $SiteConfig.ShowCartPostageForm && $PostageForm %>
                             <div class="unit-50 size10f2 col-xs-12 col-sm-6 checkout-cart-postage">
                                 $PostageForm
                             </div>
@@ -53,8 +51,8 @@
             </div>
 
             <% with $Estimate %>
-                <div class="unit-33 unit size1of3 col-xs-12 col-md-4">
-                    <table class="checkout-total-table width-100">
+                <div class="unit size1of3 col-xs-12 col-md-4">
+                    <table class="shoppingcart-total-table table">
                         <tr class="subtotal">
                             <td class="text-right">
                                 <strong>
@@ -80,7 +78,7 @@
                             </tr>
                         <% end_if %>
 
-                        <% if $Up.PostageForm %>
+                        <% if $isDeliverable %>
                             <tr class="shipping">
                                 <td class="text-right">
                                     <strong>
@@ -106,7 +104,7 @@
                             </tr>
                         <% end_if %>
                         
-                        <tr class="total">
+                        <tr class="total lead text-success">
                             <td class="text-right">
                                 <strong class="uppercase bold">
                                     <%t ShoppingCart.CartTotal 'Total' %>
