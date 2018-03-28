@@ -30,6 +30,7 @@ use SilverCommerce\OrdersAdmin\Model\PostageArea;
 use SilverCommerce\OrdersAdmin\Tools\ShippingCalculator;
 use SilverCommerce\ShoppingCart\Tasks\CleanExpiredEstimatesTask;
 use SilverCommerce\Checkout\Control\Checkout;
+use SilverCommerce\OrdersAdmin\Model\LineItemCustomisation;
 
 /**
  * Holder for items in the shopping cart and interacting with them, as
@@ -98,12 +99,21 @@ class ShoppingCart extends Controller
     
     /**
      * Class Name of item we add to the shopping cart/an estimate.
-     * This defaults to OrderItem
+     * This defaults to OrderItem.
      *
      * @var string
      * @config
      */
     private static $item_class = LineItem::class;
+
+    /**
+     * Class Name of a line item customisation that will get added to
+     * a line item.
+     *
+     * @var string
+     * @config
+     */
+    private static $item_customisation_class = LineItemCustomisation::class;
     
     /**
      * Should the cart globally check for stock levels on items added?
@@ -677,6 +687,7 @@ class ShoppingCart extends Controller
         $estimate = $this->getEstimate();
         $stock_item = $item->FindStockItem();
         $item_class = $this->config()->item_class;
+        $item_customisation_class = $this->config()->item_customisation_class;
         $added = false;
 
         if (!$item instanceof $item_class) {
@@ -697,8 +708,29 @@ class ShoppingCart extends Controller
             $item->write();
         }
 
-        foreach($customisations as $customisation) {
-            $item->Customisations()->add($customisation);
+        // Find item customisation association
+        $custom_association = null;
+        $custom_associations = array_merge(
+            $item->hasMany(),
+            $item->manyMany()
+        );
+
+        foreach ($custom_associations as $key => $value) {
+            if ($value == $item_customisation_class) {
+                $custom_association = $key;
+                break;
+            }
+        }
+
+        if (isset($custom_association)) {
+            foreach ($customisations as $customisation) {
+                if ($customisation instanceof $item_customisation_class) {
+                    if (!$customisation->exists()) {
+                        $customisation->write();
+                    }
+                    $item->{$custom_association}()->add($customisation);
+                }
+            }
         }
 
         $item->write();
