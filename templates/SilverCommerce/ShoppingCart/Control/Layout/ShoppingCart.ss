@@ -1,7 +1,7 @@
 <% require css('silvercommerce/shoppingcart: client/dist/css/shoppingcart.css') %>
 
 <div class="col-sm-12 content-container typography shoppingcart">
-    <h1><%t ShoppingCart.CartName 'Shopping Cart' %></h1>
+    <h1><%t SilverCommercec\ShoppingCart.CartName 'Shopping Cart' %></h1>
 
     <% if $Items.exists %>
         <div class="shoppingcart-form">
@@ -25,15 +25,15 @@
                         <% if $SiteConfig.EnableClickAndCollect %>
                             <div class="size10f2 col-xs-12 col-sm-6 shoppingcart-clickandcollect">
                                 <p class="h4">
-                                    <%t ShoppingCart.ReceiveGoods "How would you like to receive your goods?" %>
+                                    <%t SilverCommercec\ShoppingCart.ReceiveGoods "How would you like to receive your goods?" %>
                                 </p>
                                 
                                 <div class="shoppingcart-delivery-buttons">
                                     <a class="btn btn-secondary<% if not $isCollection %> btn-active active<% end_if %> width-100" href="{$Link(setdeliverytype)}/post">
-                                        <%t ShoppingCart.Delivered "Delivered" %>
+                                        <%t SilverCommercec\ShoppingCart.Delivered "Delivered" %>
                                     </a>
                                     <a class="btn btn-secondary<% if $isCollection %> btn-active active<% end_if %> width-100" href="{$Link(setdeliverytype)}/collect">
-                                        <%t ShoppingCart.CollectInstore "Collect Instore" %>
+                                        <%t SilverCommercec\ShoppingCart.CollectInstore "Collect Instore" %>
                                     </a>
                                 </div>
                             </div>
@@ -56,7 +56,7 @@
                         <tr class="subtotal">
                             <td class="text-right">
                                 <strong>
-                                    <%t ShoppingCart.SubTotal 'Sub Total' %>
+                                    <%t SilverCommercec\ShoppingCart.SubTotal 'Sub Total' %>
                                 </strong>
                             </td>
                             <td class="text-right">
@@ -68,7 +68,7 @@
                             <tr class="discount">
                                 <td class="text-right">
                                     <strong>
-                                        <%t ShoppingCart.Discount 'Discount' %>
+                                        <%t SilverCommercec\ShoppingCart.Discount 'Discount' %>
                                     </strong><br/>
                                     ($Discount.Title)
                                 </td>
@@ -82,11 +82,11 @@
                             <tr class="shipping">
                                 <td class="text-right">
                                     <strong>
-                                        <%t ShoppingCart.Shipping 'Shipping' %>
+                                        <%t SilverCommercec\ShoppingCart.Postage 'Postage' %>
                                     </strong>
                                 </td>
                                 <td class="text-right">
-                                    {$PostageCost.Nice}
+                                    {$PostagePrice.Nice}
                                 </td>
                             </tr>
                         <% end_if %>
@@ -95,7 +95,7 @@
                             <tr class="tax">
                                 <td class="text-right">
                                     <strong>
-                                        <%t ShoppingCart.Tax 'Tax' %>
+                                        <%t SilverCommercec\ShoppingCart.Tax 'Tax' %>
                                     </strong>
                                 </td>
                                 <td class="text-right">
@@ -107,7 +107,7 @@
                         <tr class="total lead text-success">
                             <td class="text-right">
                                 <strong class="uppercase bold">
-                                    <%t ShoppingCart.CartTotal 'Total' %>
+                                    <%t SilverCommercec\ShoppingCart.CartTotal 'Total' %>
                                 </strong>
                             </td>
                             <td class="text-right">
@@ -118,7 +118,7 @@
                     
                     <p class="checkout-cart-proceed line units-row end">
                         <a href="{$Up.Link('checkout')}" class="btn btn-green btn-big btn-lg btn-success">
-                            <%t ShoppingCart.CartProceed 'Proceed to Checkout' %>
+                            <%t SilverCommercec\ShoppingCart.CartProceed 'Proceed to Checkout' %>
                         </a>
                     </p>
                 </div>
@@ -127,7 +127,7 @@
     <% else %>
         <p>
             <strong>
-                <%t ShoppingCart.CartIsEmpty 'Your cart is currently empty' %>
+                <%t SilverCommercec\ShoppingCart.CartIsEmpty 'Your cart is currently empty' %>
             </strong>
         </p>
     <% end_if %>

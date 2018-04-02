@@ -2,35 +2,39 @@
 
 namespace SilverCommerce\ShoppingCart\Control;
 
-use SilverStripe\Control\Controller;
-use SilverStripe\Control\Director;
-use SilverStripe\Control\Cookie;
-use SilverStripe\Security\Member;
-use SilverStripe\Security\Security;
-use SilverStripe\ORM\ArrayList;
-use SilverStripe\ORM\ValidationResult;
-use SilverStripe\ORM\FieldType\DBDatetime;
-use SilverStripe\ORM\ValidationException;
-use SilverStripe\Core\Injector\Injector;
 use SilverStripe\i18n\i18n;
 use SilverStripe\Forms\Form;
+use SilverStripe\ORM\ArrayList;
+use SilverStripe\Control\Cookie;
 use SilverStripe\Forms\FieldList;
 use SilverStripe\Forms\TextField;
+use SilverStripe\Security\Member;
+use SilverStripe\Control\Director;
 use SilverStripe\Forms\FormAction;
+use SilverStripe\Security\Security;
+use SilverStripe\Control\Controller;
+use SilverStripe\Control\HTTPRequest;
 use SilverStripe\Forms\DropdownField;
 use SilverStripe\Forms\OptionsetField;
 use SilverStripe\Forms\RequiredFields;
+use SilverStripe\ORM\ValidationResult;
 use SilverStripe\SiteConfig\SiteConfig;
-use SilverStripe\Control\HTTPRequest;
-use SilverStripe\CMS\Controllers\ContentController;
+use SilverStripe\Core\Injector\Injector;
+use SilverCommerce\GeoZones\Model\Region;
+use SilverStripe\ORM\ValidationException;
+use SilverCommerce\Postage\Helpers\Parcel;
+use SilverStripe\ORM\FieldType\DBDatetime;
+use SilverCommerce\Checkout\Control\Checkout;
+use SilverCommerce\OrdersAdmin\Model\Discount;
 use SilverCommerce\OrdersAdmin\Model\Estimate;
 use SilverCommerce\OrdersAdmin\Model\LineItem;
-use SilverCommerce\OrdersAdmin\Model\Discount;
 use SilverCommerce\OrdersAdmin\Model\PostageArea;
+use SilverStripe\CMS\Controllers\ContentController;
 use SilverCommerce\OrdersAdmin\Tools\ShippingCalculator;
-use SilverCommerce\ShoppingCart\Tasks\CleanExpiredEstimatesTask;
-use SilverCommerce\Checkout\Control\Checkout;
 use SilverCommerce\OrdersAdmin\Model\LineItemCustomisation;
+use SilverCommerce\ShoppingCart\Tasks\CleanExpiredEstimatesTask;
+use SilverCommerce\Postage\Helpers\PostageOption;
+use SilverCommerce\GeoZones\Forms\RegionSelectionField;
 
 /**
  * Holder for items in the shopping cart and interacting with them, as
@@ -170,19 +174,14 @@ class ShoppingCart extends Controller
         "PostageForm",
         "DiscountForm"
     ];
-
-    /**
-     * Getters and setters
-     *
-     */
-    public function getClassName()
-    {
-        return self::config()->class_name;
-    }
     
     public function getTitle()
     {
-        return ($this->config()->title) ? $this->config()->title : _t("ShoppingCart.CartName", "Shopping Cart");
+        if ($this->config()->title) {
+            return $this->config()->title;
+        } else {
+            _t("SilverCommerce\ShoppingCart.CartName", "Shopping Cart");
+        }
     }
     
     public function getMetaTitle()
@@ -224,12 +223,12 @@ class ShoppingCart extends Controller
 
     public function getPostage()
     {
-        return $this->estimate->Postage();
+        return $this->estimate->getPostage();
     }
 
-    public function setPostage(PostageArea $postage)
+    public function setPostage(PostageOption $postage)
     {
-        $this->estimate->PostageID = $postage->ID;
+        $this->estimate->setPostage($postage);
         return $this;
     }
     
@@ -278,60 +277,32 @@ class ShoppingCart extends Controller
         $request = Injector::inst()->get(HTTPRequest::class);
         return $request->getSession();
     }
-
-    /**
-     * Get any postage items that have been set
-     *
-     * @return ArrayList
-     */
-    public function getAvailablePostage()
-    {
-        $session = $this->getSession();
-        $postage = $session->get("ShoppingCart.AvailablePostage");
-
-        if (!$postage) {
-            $postage = ArrayList::create();
-        }
-
-        return $postage;
-    }
     
     /**
-     * Set postage that is available to the shopping cart based on the
-     * country and zip code submitted
+     * Get postage that is available to the shopping cart based on the
+     * country and region submitted
      *
      * @param $country 2 character country code
-     * @param $code Zip or Postal code
-     * @return ShoppingCart
+     * @param $region 3 character region/subdivision code
+     * @return ArrayList
      */
-    public function setAvailablePostage($country, $code)
+    public function getPostageAreas($country, $region)
     {
-        $session = $this->getSession();
-        $postage_areas = new ShippingCalculator($code, $country);
+        $parcel = Parcel::create(
+            $country,
+            $region
+        );
 
-        $postage_areas
-            ->setCost($this->SubTotalCost)
+        $parcel
+            ->setValue($this->SubTotalCost)
             ->setWeight($this->TotalWeight)
             ->setItems($this->TotalItems);
 
-        $postage_areas = $postage_areas->getPostageAreas();
+        $postage_areas = $parcel->getPostageOptions();
 
-        $this->extend('updateAvailablePostage',$postage_areas);
+        $this->extend('updatePostageAreas', $postage_areas);
 
-        $session->set("ShoppingCart.AvailablePostage", $postage_areas);
-
-        // If current postage is not available, clear it.
-        $postage_id = $session->get("ShoppingCart.PostageID");
-
-        if (!$postage_areas->find("ID", $postage_id)) {
-            if ($postage_areas->exists()) {
-                $session->set("ShoppingCart.PostageID", $postage_areas->first()->ID);
-            } else {
-                $session->clear("ShoppingCart.PostageID");
-            }
-        }
-
-        return $this;
+        return $postage_areas;
     }
     
     /**
@@ -839,18 +810,6 @@ class ShoppingCart extends Controller
         $this->extend("onBeforeSave");
         
         $estimate = $this->getEstimate();
-        $session = $this->getSession();
-        
-        // Update available postage (or clear any set if not deliverable)
-        $data = $session->get("Form.Form_PostageForm.data");
-        if ($data && is_array($data) && $this->isDeliverable()) {
-            $country = $data["Country"];
-            $code = $data["ZipCode"];
-            $this->setAvailablePostage($country, $code);
-        } else {
-            $estimate->PostageID = 0;
-        }
-
         $estimate->write();
 
         // Extend our save operation
@@ -865,7 +824,7 @@ class ShoppingCart extends Controller
     {
         $estimate = $this->getEstimate();
         $this->removeAll();
-        $estimate->PostageID = 0;
+        $estimate->clearPostage();
         $estimate->DiscountID = 0;
         $this->save();
     }
@@ -970,9 +929,17 @@ class ShoppingCart extends Controller
     public function PostageForm()
     {
         if ($this->isDeliverable()) {
-            $available_postage = $this->getAvailablePostage();
             $session = $this->getSession();
             
+            $available_postage = null;
+            $curr_postage = $this->getPostage();
+            $country = $session->get("ShoppingCart.Country");
+            $region = $session->get("ShoppingCart.Region");
+
+            if (isset($country) && isset($region)) {
+                $available_postage = $this->getPostageAreas($country, $region);
+            }
+
             // Setup form
             $form = Form::create(
                 $this,
@@ -980,69 +947,73 @@ class ShoppingCart extends Controller
                 $fields = FieldList::create(
                     DropdownField::create(
                         'Country',
-                        _t('ShoppingCart.Country', 'Country'),
-                        i18n::getData()->getCountries()
+                        _t('SilverCommerce\ShoppingCart.Country', 'Country'),
+                        array_change_key_case(
+                            i18n::getData()->getCountries(),
+                            CASE_UPPER
+                        )
                     )->setEmptyString(""),
-                    TextField::create(
-                        "ZipCode",
-                        _t('Checkout.ZipCode', "Zip/Postal Code")
-                    )
+                    RegionSelectionField::create(
+                        "Region",
+                        _t('SilverCommerce\ShoppingCart.Region', "County/State"),
+                        "Country"
+                    )->setEmptyString("")
                 ),
                 $actions = FieldList::create(
                     FormAction::create(
                         "doSetPostage",
-                        _t('Checkout.Search', "Search")
+                        _t('SilverCommerce\ShoppingCart.Search', "Search")
                     )->addExtraClass('btn')
                     ->addExtraClass('btn btn-green btn-success')
                 ),
                 $required = RequiredFields::create(array(
                     "Country",
-                    "ZipCode"
+                    "Region"
                 ))
             )->setLegend(_t(
-                "ShoppingCart.EstimateShipping",
-                "Estimate Shipping"
+                "SilverCommerce\ShoppingCart.EstimatePostage",
+                "Estimate Postage"
             ));
 
             // If we have stipulated a search, then see if we have any results
             // otherwise load empty fieldsets
-            if ($available_postage->exists()) {
+            if (isset($available_postage) && $available_postage->exists()) {
                 // Loop through all postage areas and generate a new list
                 $postage_array = array();
-                
+
                 foreach ($available_postage as $area) {
-                    $area_currency = new Currency("Cost");
-                    $area_currency->setValue($area->Cost);
-                    $postage_array[$area->ID] = $area->Title . " (" . $area_currency->Nice() . ")";
+                    $postage_array[$area->getKey()] = $area->getSummary();
                 }
                 
                 $fields->add(OptionsetField::create(
-                    "PostageID",
-                    _t('ShoppingCart.SelectPostage', "Select Postage"),
+                    "PostageKey",
+                    _t('SilverCommerce\ShoppingCart.SelectPostage', "Select Postage"),
                     $postage_array
                 ));
                 
                 $actions
                     ->dataFieldByName("action_doSetPostage")
-                    ->setTitle(_t('ShoppingCart.Update', "Update"));
+                    ->setTitle(_t('SilverCommerce\ShoppingCart.Update', "Update"));
             }
             
             // Check if the form has been re-posted and load data
             $data = $session->get("Form.{$form->FormName()}.data");
-            if (is_array($data)) {
-                $form->loadDataFrom($data);
+
+            if (!is_array($data)) {
+                $data = [];
             }
             
-            // Check if the postage area has been set, if so, Set Postage ID
-            $data = array();
-            $data["PostageID"] = $session->get("Checkout.PostageID");
-            if (is_array($data)) {
-                $form->loadDataFrom($data);
+            // Set postage key from session
+            if ($curr_postage instanceof PostageOption) {
+                $data["PostageKey"] = $curr_postage->getKey();
             }
+
+            // Set data to form
+            $form->loadDataFrom($data);
             
             // Extension call
             $this->extend("updatePostageForm", $form);
-            
+
             return $form;
         }
     }
@@ -1128,29 +1099,32 @@ class ShoppingCart extends Controller
     {
         $session = $this->getSession();
         $country = $data["Country"];
-        $code = $data["ZipCode"];
-        
-        $this->setAvailablePostage($country, $code);        
-        $areas = $this->getAvailablePostage();
-        $postage = null;
-        
-        // Check that postage is set, if not, see if we can set a default
-        if (array_key_exists("PostageID", $data) && $data["PostageID"]) {
-            // First is the current postage ID in the list of postage
-            // areas
-            $postage = $areas->find("ID", $data["PostageID"]);
-            $id = 0;
+        $region = $data["Region"];
 
-            if ($postage) {
-                $data["PostageID"] = $postage->ID;
+        $session->set("ShoppingCart.Country", $country);
+        $session->set("ShoppingCart.Region", $region);
+
+        $areas = $this->getPostageAreas($country, $region);
+        $postage = null;
+
+        // Check that postage is set, if not, see if we can set a default
+        if (array_key_exists("PostageKey", $data) && $data["PostageKey"]) {
+            // First is the current postage ID in the list of postage areas
+            foreach ($areas as $area) {
+                if ($data["PostageKey"] == $area->getKey()) {
+                    $postage = $area;
+                }
             }
-        } elseif ($areas->exists()) {
+        } 
+        
+        if (!$postage && $areas->exists()) {
             $postage = $areas->first();
-            $data["PostageID"] = $postage->ID;
+            $data["PostageKey"] = $postage->getKey();
         }
 
         if ($postage) {
             $this->setPostage($postage);
+            $this->save();
         }
 
         // Set the form pre-populate data before redirecting
