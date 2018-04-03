@@ -35,6 +35,7 @@ use SilverCommerce\OrdersAdmin\Model\LineItemCustomisation;
 use SilverCommerce\ShoppingCart\Tasks\CleanExpiredEstimatesTask;
 use SilverCommerce\Postage\Helpers\PostageOption;
 use SilverCommerce\GeoZones\Forms\RegionSelectionField;
+use SilverStripe\Forms\ReadonlyField;
 
 /**
  * Holder for items in the shopping cart and interacting with them, as
@@ -294,9 +295,9 @@ class ShoppingCart extends Controller
         );
 
         $parcel
-            ->setValue($this->SubTotalCost)
-            ->setWeight($this->TotalWeight)
-            ->setItems($this->TotalItems);
+            ->setValue($this->estimate->SubTotal)
+            ->setWeight($this->estimate->TotalWeight)
+            ->setItems($this->estimate->TotalItems);
 
         $postage_areas = $parcel->getPostageOptions();
 
@@ -930,7 +931,6 @@ class ShoppingCart extends Controller
     {
         if ($this->isDeliverable()) {
             $session = $this->getSession();
-            
             $available_postage = null;
             $curr_postage = $this->getPostage();
             $country = $session->get("ShoppingCart.Country");
@@ -984,18 +984,29 @@ class ShoppingCart extends Controller
                 foreach ($available_postage as $area) {
                     $postage_array[$area->getKey()] = $area->getSummary();
                 }
-                
+
                 $fields->add(OptionsetField::create(
                     "PostageKey",
                     _t('SilverCommerce\ShoppingCart.SelectPostage', "Select Postage"),
                     $postage_array
                 ));
-                
+
                 $actions
                     ->dataFieldByName("action_doSetPostage")
                     ->setTitle(_t('SilverCommerce\ShoppingCart.Update', "Update"));
+            } elseif (isset($available_postage)) {
+                $fields->add(
+                    ReadonlyField::create(
+                        "NoPostage",
+                        "",
+                        _t(
+                            'SilverCommerce\ShoppingCart.CannotPost',
+                            'Unfortunatley we cannot post to this location'
+                        )
+                    )->addExtraClass("text-danger")
+                );
             }
-            
+
             // Check if the form has been re-posted and load data
             $data = $session->get("Form.{$form->FormName()}.data");
 
