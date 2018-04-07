@@ -14,6 +14,9 @@ SilverStripe\Security\Group:
 SilverCommerce\OrdersAdmin\Model\Estimate:
   extensions:
     - SilverCommerce\ShoppingCart\Extensions\EstimateExtension
+SilverCommerce\OrdersAdmin\Model\Invoice:
+  extensions:
+    - SilverCommerce\ShoppingCart\Extensions\InvoiceExtension
 SilverStripe\Security\Member:
   extensions:
     - SilverCommerce\ShoppingCart\Extensions\MemberExtension
