@@ -2,40 +2,30 @@
 
 namespace SilverCommerce\ShoppingCart\Control;
 
-use SilverStripe\i18n\i18n;
 use SilverStripe\Forms\Form;
 use SilverStripe\ORM\ArrayList;
 use SilverStripe\Control\Cookie;
 use SilverStripe\Forms\FieldList;
 use SilverStripe\Forms\TextField;
-use SilverStripe\Security\Member;
 use SilverStripe\Control\Director;
 use SilverStripe\Forms\FormAction;
 use SilverStripe\Security\Security;
 use SilverStripe\Control\Controller;
 use SilverStripe\Control\HTTPRequest;
-use SilverStripe\Forms\DropdownField;
-use SilverStripe\Forms\OptionsetField;
-use SilverStripe\Forms\RequiredFields;
 use SilverStripe\ORM\ValidationResult;
 use SilverStripe\SiteConfig\SiteConfig;
 use SilverStripe\Core\Injector\Injector;
-use SilverCommerce\GeoZones\Model\Region;
 use SilverStripe\ORM\ValidationException;
-use SilverCommerce\Postage\Helpers\Parcel;
 use SilverStripe\ORM\FieldType\DBDatetime;
 use SilverCommerce\Checkout\Control\Checkout;
 use SilverCommerce\OrdersAdmin\Model\Discount;
 use SilverCommerce\OrdersAdmin\Model\Estimate;
 use SilverCommerce\OrdersAdmin\Model\LineItem;
-use SilverCommerce\OrdersAdmin\Model\PostageArea;
+use SilverCommerce\Postage\Helpers\PostageOption;
 use SilverStripe\CMS\Controllers\ContentController;
-use SilverCommerce\OrdersAdmin\Tools\ShippingCalculator;
 use SilverCommerce\OrdersAdmin\Model\LineItemCustomisation;
 use SilverCommerce\ShoppingCart\Tasks\CleanExpiredEstimatesTask;
-use SilverCommerce\Postage\Helpers\PostageOption;
-use SilverCommerce\GeoZones\Forms\RegionSelectionField;
-use SilverStripe\Forms\ReadonlyField;
+use SilverCommerce\Postage\Forms\PostageForm;
 
 /**
  * Holder for items in the shopping cart and interacting with them, as
@@ -278,34 +268,7 @@ class ShoppingCart extends Controller
         $request = Injector::inst()->get(HTTPRequest::class);
         return $request->getSession();
     }
-    
-    /**
-     * Get postage that is available to the shopping cart based on the
-     * country and region submitted
-     *
-     * @param $country 2 character country code
-     * @param $region 3 character region/subdivision code
-     * @return ArrayList
-     */
-    public function getPostageAreas($country, $region)
-    {
-        $parcel = Parcel::create(
-            $country,
-            $region
-        );
 
-        $parcel
-            ->setValue($this->estimate->SubTotal)
-            ->setWeight($this->estimate->TotalWeight)
-            ->setItems($this->estimate->TotalItems);
-
-        $postage_areas = $parcel->getPostageOptions();
-
-        $this->extend('updatePostageAreas', $postage_areas);
-
-        return $postage_areas;
-    }
-    
     /**
      * Are we collecting the current cart? If click and collect is
      * disabled then this returns false, otherwise checks if the user
@@ -930,98 +893,20 @@ class ShoppingCart extends Controller
     public function PostageForm()
     {
         if ($this->isDeliverable()) {
-            $session = $this->getSession();
-            $available_postage = null;
-            $curr_postage = $this->getPostage();
-            $country = $session->get("ShoppingCart.Country");
-            $region = $session->get("ShoppingCart.Region");
-
-            if (isset($country) && isset($region)) {
-                $available_postage = $this->getPostageAreas($country, $region);
-            }
-
-            // Setup form
-            $form = Form::create(
+            $form = PostageForm::create(
                 $this,
-                'PostageForm',
-                $fields = FieldList::create(
-                    DropdownField::create(
-                        'Country',
-                        _t('SilverCommerce\ShoppingCart.Country', 'Country'),
-                        array_change_key_case(
-                            i18n::getData()->getCountries(),
-                            CASE_UPPER
-                        )
-                    )->setEmptyString(""),
-                    RegionSelectionField::create(
-                        "Region",
-                        _t('SilverCommerce\ShoppingCart.Region', "County/State"),
-                        "Country"
-                    )->setEmptyString("")
-                ),
-                $actions = FieldList::create(
-                    FormAction::create(
-                        "doSetPostage",
-                        _t('SilverCommerce\ShoppingCart.Search', "Search")
-                    )->addExtraClass('btn')
-                    ->addExtraClass('btn btn-green btn-success')
-                ),
-                $required = RequiredFields::create(array(
-                    "Country",
-                    "Region"
-                ))
-            )->setLegend(_t(
+                "PostageForm",
+                $this->estimate,
+                $this->estimate->SubTotal,
+                $this->estimate->TotalWeight,
+                $this->estimate->TotalItems
+            );
+
+            $form->setLegend(_t(
                 "SilverCommerce\ShoppingCart.EstimatePostage",
                 "Estimate Postage"
             ));
 
-            // If we have stipulated a search, then see if we have any results
-            // otherwise load empty fieldsets
-            if (isset($available_postage) && $available_postage->exists()) {
-                // Loop through all postage areas and generate a new list
-                $postage_array = array();
-
-                foreach ($available_postage as $area) {
-                    $postage_array[$area->getKey()] = $area->getSummary();
-                }
-
-                $fields->add(OptionsetField::create(
-                    "PostageKey",
-                    _t('SilverCommerce\ShoppingCart.SelectPostage', "Select Postage"),
-                    $postage_array
-                ));
-
-                $actions
-                    ->dataFieldByName("action_doSetPostage")
-                    ->setTitle(_t('SilverCommerce\ShoppingCart.Update', "Update"));
-            } elseif (isset($available_postage)) {
-                $fields->add(
-                    ReadonlyField::create(
-                        "NoPostage",
-                        "",
-                        _t(
-                            'SilverCommerce\ShoppingCart.CannotPost',
-                            'Unfortunatley we cannot post to this location'
-                        )
-                    )->addExtraClass("text-danger")
-                );
-            }
-
-            // Check if the form has been re-posted and load data
-            $data = $session->get("Form.{$form->FormName()}.data");
-
-            if (!is_array($data)) {
-                $data = [];
-            }
-            
-            // Set postage key from session
-            if ($curr_postage instanceof PostageOption) {
-                $data["PostageKey"] = $curr_postage->getKey();
-            }
-
-            // Set data to form
-            $form->loadDataFrom($data);
-            
             // Extension call
             $this->extend("updatePostageForm", $form);
 
@@ -1097,55 +982,5 @@ class ShoppingCart extends Controller
         }
         
         return $this->redirectBack();
-    }
-    
-    /**
-     * Method that deals with get postage details and setting the
-     * postage
-     *
-     * @param $data
-     * @param $form
-     */
-    public function doSetPostage($data, $form)
-    {
-        $session = $this->getSession();
-        $country = $data["Country"];
-        $region = $data["Region"];
-
-        $session->set("ShoppingCart.Country", $country);
-        $session->set("ShoppingCart.Region", $region);
-
-        $areas = $this->getPostageAreas($country, $region);
-        $postage = null;
-
-        // Check that postage is set, if not, see if we can set a default
-        if (array_key_exists("PostageKey", $data) && $data["PostageKey"]) {
-            // First is the current postage ID in the list of postage areas
-            foreach ($areas as $area) {
-                if ($data["PostageKey"] == $area->getKey()) {
-                    $postage = $area;
-                }
-            }
-        } 
-        
-        if (!$postage && $areas->exists()) {
-            $postage = $areas->first();
-            $data["PostageKey"] = $postage->getKey();
-        }
-
-        if ($postage) {
-            $this->setPostage($postage);
-            $this->save();
-        }
-
-        // Set the form pre-populate data before redirecting
-        $session->set("Form.{$form->FormName()}.data", $data);
-        
-        $url = Controller::join_links(
-            $this->Link(),
-            "#{$form->FormName()}"
-        );
-        
-        return $this->redirect($url);
     }
 }
