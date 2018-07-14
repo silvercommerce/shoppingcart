@@ -8,9 +8,7 @@
           "silvercommerce",
           "commerce",
           "ecommerce",
-          "shoppingcart",
-          "shop",
-          "estimates"
+          "shoppingcart"
       ],
       "license": "BSD-3-Clause",
       "authors": [
@@ -29,12 +27,9 @@
       "require": {
           "silverstripe/framework": "~4.0",
           "silvercommerce/settings": "~1.0",
-          "silvercommerce/orders-admin": "1.*@dev",
+          "silvercommerce/orders-admin": "~1.0",
+          "silvercommerce/discounts": "1.*@dev",
           "silvercommerce/postage": "~1.0"
-      },
-      "suggest": {
-          "silverstripe/cms": "Add full content management support to your site",
-          "i-lateral/silverstripe-users": "Add user account management, login and registration"
       },
       "extra": {
           "expose": [
@@ -43,7 +38,8 @@
       },
       "autoload": {
           "psr-4": {
-              "SilverCommerce\\ShoppingCart\\": "src/"
+              "SilverCommerce\\ShoppingCart\\": "src/",
+              "SilverCommerce\\ShoppingCart\\Tests": "tests/"
           }
       }
   }
