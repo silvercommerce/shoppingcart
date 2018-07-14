@@ -17,7 +17,6 @@ class SiteConfigExtension extends DataExtension
 {
     
     private static $db = [
-        "EnableClickAndCollect" => "Boolean",
         "ShowCartPostageForm" => "Boolean",
         "ShowCartDiscountForm" => "Boolean",
         'LastEstimateClean' => 'DBDatetime'
@@ -25,7 +24,6 @@ class SiteConfigExtension extends DataExtension
     
     public function updateCMSFields(FieldList $fields)
     {
-        $fields->removeByName("EnableClickAndCollect");
         $fields->removeByName("ShowCartPostageForm");
         $fields->removeByName("ShowCartDiscountForm");
         $fields->removeByName("LastEstimateClean");
@@ -43,10 +41,6 @@ class SiteConfigExtension extends DataExtension
                     CheckboxField::create(
                         "ShowCartDiscountForm",
                         $this->owner->fieldLabel("ShowCartDiscountForm")
-                    ),
-                    CheckboxField::create(
-                        "EnableClickAndCollect",
-                        $this->owner->fieldLabel("EnableClickAndCollect")
                     )
                 ]
             )
