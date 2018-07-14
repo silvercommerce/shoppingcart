@@ -1,6 +1,11 @@
 ---
 Name: shoppingcartconfig
 ---
+## Extra DB fields
+SilverStripe\Security\Member:
+  has_one:
+    Cart: SilverCommerce\ShoppingCart\Model\ShoppingCart
+
 ## Extensions
 SilverStripe\Control\Controller:
   extensions:
@@ -8,15 +13,3 @@ SilverStripe\Control\Controller:
 SilverStripe\SiteConfig\SiteConfig:
   extensions:
     - SilverCommerce\ShoppingCart\Extensions\SiteConfigExtension
-SilverStripe\Security\Group:
-  extensions:
-    - SilverCommerce\ShoppingCart\Extensions\GroupExtension
-SilverCommerce\OrdersAdmin\Model\Estimate:
-  extensions:
-    - SilverCommerce\ShoppingCart\Extensions\EstimateExtension
-SilverCommerce\OrdersAdmin\Model\Invoice:
-  extensions:
-    - SilverCommerce\ShoppingCart\Extensions\InvoiceExtension
-SilverStripe\Security\Member:
-  extensions:
-    - SilverCommerce\ShoppingCart\Extensions\MemberExtension
