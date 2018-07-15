@@ -3,14 +3,16 @@
 namespace SilverCommerce\ShoppingCart\Forms;
 
 use SilverStripe\Forms\Form;
-use SilverStripe\Forms\Validator;
 use SilverStripe\Forms\FieldList;
+use SilverStripe\Forms\Validator;
 use SilverStripe\Forms\FormAction;
 use SilverStripe\Forms\HiddenField;
 use SilverStripe\Core\Config\Config;
 use SilverStripe\Forms\RequiredFields;
 use SilverStripe\ORM\ValidationResult;
 use SilverStripe\Control\RequestHandler;
+use SilverCommerce\OrdersAdmin\Model\LineItem;
+use SilverCommerce\ShoppingCart\ShoppingCartFactory;
 use SilverCommerce\QuantityField\Forms\QuantityField;
 use SilverCommerce\ShoppingCart\Control\ShoppingCart;
 
@@ -141,20 +143,20 @@ class AddToCartForm extends Form
     {
         $classname = $data["ClassName"];
         $id = $data["ID"];
-        $cart = ShoppingCart::get();
-        $item_class = Config::inst()
-            ->get(ShoppingCart::class, "item_class");
+        $cart = ShoppingCartFactory::create();
+        $error = false;
+        $redirect_to_cart = Config::inst()
+            ->get(ShoppingCart::class, "redirect_on_add");
 
         if ($object = $classname::get()->byID($id)) {
-            if (method_exists($object, "getTaxFromCategory")) {
-                $tax_rate = $object->getTaxFromCategory();
-            } else {
-                $tax_rate = null;
-            }
+            // Attempt to get tax rate from object
+            // On a Product this is handleed via casting
+            // But could be a direct association as well.
+            $tax_id = $object->TaxID;
 
             $deliverable = (isset($object->Deliverable)) ? $object->Deliverable : true;
             
-            $item_to_add = $item_class::create([
+            $item_to_add = LineItem::create([
                 "Title" => $object->Title,
                 "Content" => $object->Content,
                 "Price" => $object->Price,
@@ -164,13 +166,13 @@ class AddToCartForm extends Form
                 "ProductClass" => $object->ClassName,
                 "Stocked" => $object->Stocked,
                 "Deliverable" => $deliverable,
-                "TaxRateID" => $tax_rate,
+                "TaxID" => $tax_id,
             ]);
 
             // Try and add item to cart, return any exceptions raised
             // as a message
             try {
-                $cart->add($item_to_add);
+                $cart->addItem($item_to_add);
 
                 $message = _t(
                     'ShoppingCart.AddedItemToCart',
@@ -183,14 +185,22 @@ class AddToCartForm extends Form
                     ValidationResult::TYPE_GOOD
                 );
             } catch(Exception $e) {
+                $error = true;
                 $this->sessionMessage(
                     $e->getMessage()
                 );
             }
         } else {
+            $error = true;
             $this->sessionMessage(
                 _t("ShoppingCart.ErrorAddingToCart", "Error adding item to cart")
             );
+        }
+
+        if ($redirect_to_cart && !$error) {
+            return $this
+                ->getController()
+                ->redirect($cart->Link());
         }
 
         return $this

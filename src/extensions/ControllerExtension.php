@@ -3,7 +3,7 @@
 namespace SilverCommerce\ShoppingCart\Extensions;
 
 use SilverStripe\Core\Extension;
-use SilverCommerce\ShoppingCart\Control\ShoppingCart;
+use SilverCommerce\ShoppingCart\ShoppingCartFactory;
 
 /**
  * Extension for Content Controller that provide methods such
@@ -14,7 +14,6 @@ use SilverCommerce\ShoppingCart\Control\ShoppingCart;
  */
 class ControllerExtension extends Extension
 {
-    
     /**
      * Get the current shoppingcart
      * 
@@ -22,6 +21,6 @@ class ControllerExtension extends Extension
      */
     public function getShoppingCart()
     {
-        return ShoppingCart::get();
+        return ShoppingCartFactory::create()->getCurrent();
     }
 }
