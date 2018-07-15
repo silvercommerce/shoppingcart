@@ -22,25 +22,8 @@
 
                 <% if isDeliverable %>
                     <div class="row line">
-                        <% if $SiteConfig.EnableClickAndCollect %>
-                            <div class="size10f2 col-xs-12 col-sm-6 shoppingcart-clickandcollect">
-                                <p class="h4">
-                                    <%t SilverCommercec\ShoppingCart.ReceiveGoods "How would you like to receive your goods?" %>
-                                </p>
-                                
-                                <div class="shoppingcart-delivery-buttons">
-                                    <a class="btn btn-secondary<% if not $isCollection %> btn-active active<% end_if %> width-100" href="{$Link(setdeliverytype)}/post">
-                                        <%t SilverCommercec\ShoppingCart.Delivered "Delivered" %>
-                                    </a>
-                                    <a class="btn btn-secondary<% if $isCollection %> btn-active active<% end_if %> width-100" href="{$Link(setdeliverytype)}/collect">
-                                        <%t SilverCommercec\ShoppingCart.CollectInstore "Collect Instore" %>
-                                    </a>
-                                </div>
-                            </div>
-                        <% end_if %>
-                        
-                        <% if not $isCollection && $SiteConfig.ShowCartPostageForm && $PostageForm %>
-                            <div class="unit-50 size10f2 col-xs-12 col-sm-6 checkout-cart-postage">
+                        <% if $SiteConfig.ShowCartPostageForm && $PostageForm %>
+                            <div class="size10f2 col-xs-12 col-sm-6 checkout-cart-postage">
                                 $PostageForm
                             </div>
                         <% else %>
@@ -50,79 +33,77 @@
                 <% end_if %>
             </div>
 
-            <% with $Estimate %>
-                <div class="unit size1of3 col-xs-12 col-md-4">
-                    <table class="shoppingcart-total-table table">
-                        <tr class="subtotal">
+            <div class="unit size1of3 col-xs-12 col-md-4">
+                <table class="shoppingcart-total-table table">
+                    <tr class="subtotal">
+                        <td class="text-right">
+                            <strong>
+                                <%t SilverCommercec\ShoppingCart.SubTotal 'Sub Total' %>
+                            </strong>
+                        </td>
+                        <td class="text-right">
+                            {$SubTotal.Nice}
+                        </td>
+                    </tr>
+                    
+                    <% if $Discount.exists %>
+                        <tr class="discount">
                             <td class="text-right">
                                 <strong>
-                                    <%t SilverCommercec\ShoppingCart.SubTotal 'Sub Total' %>
-                                </strong>
+                                    <%t SilverCommercec\ShoppingCart.Discount 'Discount' %>
+                                </strong><br/>
+                                ($Discount.Title)
                             </td>
                             <td class="text-right">
-                                {$SubTotal.Nice}
+                                {$DiscountAmount.Nice}
                             </td>
                         </tr>
-                        
-                        <% if $Discount.exists %>
-                            <tr class="discount">
-                                <td class="text-right">
-                                    <strong>
-                                        <%t SilverCommercec\ShoppingCart.Discount 'Discount' %>
-                                    </strong><br/>
-                                    ($Discount.Title)
-                                </td>
-                                <td class="text-right">
-                                    {$DiscountAmount.Nice}
-                                </td>
-                            </tr>
-                        <% end_if %>
+                    <% end_if %>
 
-                        <% if $isDeliverable %>
-                            <tr class="shipping">
-                                <td class="text-right">
-                                    <strong>
-                                        <%t SilverCommercec\ShoppingCart.Postage 'Postage' %>
-                                    </strong>
-                                </td>
-                                <td class="text-right">
-                                    {$PostagePrice.Nice}
-                                </td>
-                            </tr>
-                        <% end_if %>
-                        
-                        <% if $Up.ShowTax %>
-                            <tr class="tax">
-                                <td class="text-right">
-                                    <strong>
-                                        <%t SilverCommercec\ShoppingCart.Tax 'Tax' %>
-                                    </strong>
-                                </td>
-                                <td class="text-right">
-                                    {$TaxTotal.Nice}
-                                </td>
-                            </tr>
-                        <% end_if %>
-                        
-                        <tr class="total lead text-success">
+                    <% if $isDeliverable %>
+                        <tr class="shipping">
                             <td class="text-right">
-                                <strong class="uppercase bold">
-                                    <%t SilverCommercec\ShoppingCart.CartTotal 'Total' %>
+                                <strong>
+                                    <%t SilverCommercec\ShoppingCart.Postage 'Postage' %>
                                 </strong>
                             </td>
                             <td class="text-right">
-                                {$Total.Nice}
+                                {$PostagePrice.Nice}
                             </td>
                         </tr>
-                    </table>
+                    <% end_if %>
                     
-                    <p class="checkout-cart-proceed line units-row end">
-                        <a href="{$Up.Link('checkout')}" class="btn btn-green btn-big btn-lg btn-success">
-                            <%t SilverCommercec\ShoppingCart.CartProceed 'Proceed to Checkout' %>
-                        </a>
-                    </p>
-                </div>
-            <% end_with %>
+                    <% if $ShowTax %>
+                        <tr class="tax">
+                            <td class="text-right">
+                                <strong>
+                                    <%t SilverCommercec\ShoppingCart.Tax 'Tax' %>
+                                </strong>
+                            </td>
+                            <td class="text-right">
+                                {$TaxTotal.Nice}
+                            </td>
+                        </tr>
+                    <% end_if %>
+                    
+                    <tr class="total lead text-success">
+                        <td class="text-right">
+                            <strong class="uppercase bold">
+                                <%t SilverCommercec\ShoppingCart.CartTotal 'Total' %>
+                            </strong>
+                        </td>
+                        <td class="text-right">
+                            {$Total.Nice}
+                        </td>
+                    </tr>
+                </table>
+                
+                <p class="checkout-cart-proceed line units-row end">
+                    <a href="{$Link('checkout')}" class="btn btn-green btn-big btn-lg btn-success">
+                        <%t SilverCommercec\ShoppingCart.CartProceed 'Proceed to Checkout' %>
+                    </a>
+                </p>
+            </div>
         </div>
     <% else %>
         <p>
