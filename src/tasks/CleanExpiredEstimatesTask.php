@@ -4,6 +4,7 @@ namespace SilverCommerce\ShoppingCart\Tasks;
 
 use SilverStripe\Dev\BuildTask;
 use SilverStripe\Control\Director;
+use SilverCommerce\ShoppingCart\Model\ShoppingCart as ShoppingCart;
 use SilverCommerce\OrdersAdmin\Model\Estimate;
 use DateTime;
 
@@ -54,15 +55,17 @@ class CleanExpiredEstimatesTask extends BuildTask
         $days = Estimate::config()->default_end;
         $past = $now->modify("-{$days} days");
 
-        $estimates = Estimate::get()->filter([
-            "ShoppingCart" => true,
+        $all = ShoppingCart::get()->filter([
             "StartDate:LessThan" => $past->format('Y-m-d H:i:s')
         ]);
 
         $i = 0;
-        foreach ($estimates as $estimate) {
-            if (!$estimate->CustomerID) {
-                $estimate->delete();
+        foreach ($all as $cart) {
+            // Is the cart currentyl assigned to a member?
+            $curr = Member::get()->find("CartID", $cart->ID);
+
+            if (empty($curr)) {
+                $cart->delete();
                 $i++;
             }
         }
