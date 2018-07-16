@@ -338,7 +338,6 @@ class ShoppingCartFactory
         }
         
         $item->Quantity = floor($quantity);
-
         $item->write();
         
         return $this;
@@ -361,7 +360,6 @@ class ShoppingCartFactory
             ));
         }
 
-        $title = $item->Title;
         $item->delete();
 
         return $this;
@@ -375,6 +373,7 @@ class ShoppingCartFactory
      */
     public function delete()
     {
+        $cookies = $this->cookiesSupported();
         $cart = $this->getCurrent();
         $cart->delete();
 
@@ -425,5 +424,7 @@ class ShoppingCartFactory
             $session = $this->getSession();
             $session->set(self::COOKIE_NAME, $cart->AccessKey);
         }
+
+        return $this;
     }
 }
