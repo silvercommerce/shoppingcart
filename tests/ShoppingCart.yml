@@ -1,0 +1,22 @@
+SilverStripe\SiteConfig\SiteConfig:
+  default:
+    Title: "Test SiteConfig"
+SilverCommerce\OrdersAdmin\Model\LineItem:
+  test1:
+    Key: "key1"
+    Title: "A cheap item"
+    Quantity: 1
+    Price: 5.99
+    StockID: Item1
+  test2:
+    Key: "key2"
+    Title: "A cheap item"
+    Quantity: 1
+    Price: 5.99
+    StockID: Item2
+SilverCommerce\ShoppingCart\Model\ShoppingCart:
+  test1:
+    AccessKey: "abc123"
+  test2:
+    AccessKey: "123abc"
+    Items: =>SilverCommerce\OrdersAdmin\Model\LineItem.test1
