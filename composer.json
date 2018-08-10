@@ -42,6 +42,10 @@
               "SilverCommerce\\ShoppingCart\\Tests\\": "tests/"
           }
       },
+      "scripts": {
+          "lint": "phpcs -s src/ tests/",
+          "lint-clean": "phpcbf src/ tests/"
+      },
       "minimum-stability": "dev"
   }
   
