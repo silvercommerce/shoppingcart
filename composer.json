@@ -41,6 +41,7 @@
               "SilverCommerce\\ShoppingCart\\": "src/",
               "SilverCommerce\\ShoppingCart\\Tests\\": "tests/"
           }
-      }
+      },
+      "minimum-stability": "dev"
   }
   
