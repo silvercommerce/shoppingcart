@@ -2,7 +2,9 @@
 
 namespace SilverCommerce\ShoppingCart\Control;
 
+use SilverStripe\i18n\i18n;
 use SilverStripe\Forms\Form;
+use SilverStripe\View\SSViewer;
 use SilverStripe\Forms\FieldList;
 use SilverStripe\Forms\TextField;
 use SilverStripe\Control\Director;
@@ -11,11 +13,12 @@ use SilverStripe\Control\Controller;
 use SilverStripe\ORM\ValidationResult;
 use SilverStripe\SiteConfig\SiteConfig;
 use SilverStripe\Core\Injector\Injector;
+use SilverStripe\Subsites\Model\Subsite;
 use SilverStripe\ORM\ValidationException;
 use SilverCommerce\Checkout\Control\Checkout;
+use SilverCommerce\Postage\Forms\PostageForm;
 use SilverCommerce\OrdersAdmin\Model\Estimate;
 use SilverStripe\CMS\Controllers\ContentController;
-use SilverCommerce\Postage\Forms\PostageForm;
 use SilverCommerce\ShoppingCart\ShoppingCartFactory;
 
 /**
@@ -118,6 +121,29 @@ class ShoppingCart extends Controller
         parent::__construct();
 
         $this->setFailover($this->dataRecord);
+    }
+
+    /**
+     * Overwrite default init to support subsites (if installed)
+     * 
+     * @return void 
+     */
+    protected function init()
+    {
+        parent::init();
+
+        # Check for subsites and add support
+        if (class_exists(Subsite::class)) {
+            $subsite = Subsite::currentSubsite();
+
+            if ($subsite && $subsite->Theme) {
+                SSViewer::add_themes([$subsite->Theme]);
+            }
+
+            if ($subsite && i18n::getData()->validate($subsite->Language)) {
+                i18n::set_locale($subsite->Language);
+            }
+        }
     }
     
     public function getTitle()
