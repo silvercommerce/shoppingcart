@@ -6,6 +6,13 @@ SilverStripe\Security\Member:
   has_one:
     Cart: SilverCommerce\ShoppingCart\Model\ShoppingCart
 
+## Manage shopping carts from orders admin
+SilverCommerce\OrdersAdmin\Admin\OrderAdmin:
+  managed_models:
+    - SilverCommerce\OrdersAdmin\Model\Invoice
+    - SilverCommerce\OrdersAdmin\Model\Estimate
+    - SilverCommerce\ShoppingCart\Model\ShoppingCart
+
 ## Extensions
 SilverStripe\Control\Controller:
   extensions:
