@@ -2,11 +2,12 @@
 
 namespace SilverCommerce\ShoppingCart\Tasks;
 
-use SilverStripe\Dev\BuildTask;
-use SilverStripe\Control\Director;
-use SilverCommerce\ShoppingCart\Model\ShoppingCart as ShoppingCart;
-use SilverCommerce\OrdersAdmin\Model\Estimate;
 use DateTime;
+use SilverStripe\Dev\BuildTask;
+use SilverStripe\Security\Member;
+use SilverStripe\Control\Director;
+use SilverCommerce\OrdersAdmin\Model\Estimate;
+use SilverCommerce\ShoppingCart\Model\ShoppingCart as ShoppingCart;
 
 /**
  * Simple task that removes estimates that have passed their end date
