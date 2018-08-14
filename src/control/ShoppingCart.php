@@ -109,21 +109,6 @@ class ShoppingCart extends Controller
     ];
 
     /**
-     * Create this controller and attach the relevent ShoppingCart
-     *
-     * @return null
-     */
-    public function __construct()
-    {
-        $dataRecord = ShoppingCartFactory::create()->getCurrent();
-        $this->setDataRecord($dataRecord);
-
-        parent::__construct();
-
-        $this->setFailover($this->dataRecord);
-    }
-
-    /**
      * Overwrite default init to support subsites (if installed)
      * 
      * @return void 
@@ -131,6 +116,12 @@ class ShoppingCart extends Controller
     protected function init()
     {
         parent::init();
+
+        // Setup current controller on init (as Security::getMember()
+        // is not available on construction)
+        $dataRecord = ShoppingCartFactory::create()->getCurrent();
+        $this->setDataRecord($dataRecord);
+        $this->setFailover($this->dataRecord);
 
         # Check for subsites and add support
         if (class_exists(Subsite::class)) {
