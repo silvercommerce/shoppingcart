@@ -375,7 +375,11 @@ class ShoppingCartFactory
     {
         $cookies = $this->cookiesSupported();
         $cart = $this->getCurrent();
-        $cart->delete();
+
+        // Only delete the cart if it has been written to the DB
+        if ($cart->exists()) {
+            $cart->delete();
+        }
 
         if ($cookies) {
             Cookie::force_expiry(self::COOKIE_NAME);
