@@ -15,6 +15,7 @@ use SilverStripe\SiteConfig\SiteConfig;
 use SilverStripe\Core\Injector\Injector;
 use SilverStripe\Subsites\Model\Subsite;
 use SilverStripe\ORM\ValidationException;
+use SilverCommerce\Discounts\Model\Discount;
 use SilverCommerce\Checkout\Control\Checkout;
 use SilverCommerce\Postage\Forms\PostageForm;
 use SilverCommerce\OrdersAdmin\Model\Estimate;
@@ -68,14 +69,6 @@ class ShoppingCart extends Controller
      * @config
      */
     private static $checkout_class = Checkout::class;
-
-    /**
-     * Show the discount form on the shopping cart
-     *
-     * @var boolean
-     * @config
-     */
-    private static $show_discount_form = false;
 
     /**
      * Redirect the user to the cart when an item is added?
@@ -149,11 +142,6 @@ class ShoppingCart extends Controller
     public function getMetaTitle()
     {
         return $this->getTitle();
-    }
-
-    public function getShowDiscountForm()
-    {
-        return $this->config()->show_discount_form;
     }
 
     public function getDataRecord()
@@ -306,15 +294,8 @@ class ShoppingCart extends Controller
         // First check if the discount is already added (so we don't
         // query the DB if we don't have to).
         if (!$curr || ($curr && $curr->Code != $code_to_search)) {
-            $code = Discount::get()
-                ->filter("Code", $code_to_search)
-                ->exclude("Expires:LessThan", date("Y-m-d"))
-                ->first();
-            
-            if ($code) {
-                $this->setDiscount($code);
-                $this->save();
-            }
+            $this->setDiscount($code_to_search);
+            ShoppingCartFactory::create()->save();
         } elseif ($curr && $code->Code == $code_to_search) {
             $code = $this->getDiscount();
         }
@@ -504,15 +485,8 @@ class ShoppingCart extends Controller
         // First check if the discount is already added (so we don't
         // query the DB if we don't have to).
         if ($this->getDiscount()->Code != $code_to_search) {
-            $code = Discount::get()
-                ->filter("Code", $code_to_search)
-                ->exclude("Expires:LessThan", date("Y-m-d"))
-                ->first();
-            
-            if ($code) {
-                $this->setDiscount($code);
-                $this->save();
-            }
+            $this->setDiscount($code_to_search);
+            ShoppingCartFactory::create()->save();
         }
         
         return $this->redirectBack();
