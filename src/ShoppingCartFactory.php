@@ -2,6 +2,7 @@
 
 namespace SilverCommerce\ShoppingCart;
 
+use SilverStripe\Dev\Debug;
 use SilverStripe\Control\Cookie;
 use SilverStripe\Security\Security;
 use SilverStripe\Control\HTTPRequest;
@@ -238,14 +239,16 @@ class ShoppingCartFactory
         // Define association of item to customisations
         foreach ($custom_associations as $key => $value) {
             $class = $value::create();
-            if ($value instanceof LineItemCustomisation) {
+            if ($class instanceof LineItemCustomisation) {
                 $custom_association = $key;
                 break;
             }
         }
 
+
         // Map any customisations to the current item
         if (isset($custom_association)) {
+            $item->write();
             foreach ($customisations as $customisation) {
                 if ($customisation instanceof LineItemCustomisation) {
                     if (!$customisation->exists()) {
@@ -255,7 +258,7 @@ class ShoppingCartFactory
                 }
             }
         }
-
+        
         // Ensure we update the item key
         $item->write();
 
