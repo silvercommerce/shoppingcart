@@ -297,6 +297,7 @@ class ShoppingCartFactory
                 ->Items()
                 ->add($item);
         }
+        $this->save();
 
         return $this;
     }
@@ -364,6 +365,7 @@ class ShoppingCartFactory
         }
 
         $item->delete();
+        $this->save();
 
         return $this;
     }

@@ -459,6 +459,7 @@ class ShoppingCart extends Controller
                     }
                 }
             }
+            ShoppingCartFactory::create()->save();
         } catch (ValidationException $e) {
             $form->sessionMessage(
                 $e->getMessage()
