@@ -17,9 +17,11 @@ use SilverStripe\Subsites\Model\Subsite;
 use SilverStripe\ORM\ValidationException;
 use SilverCommerce\Discounts\Model\Discount;
 use SilverCommerce\Checkout\Control\Checkout;
+use SilverCommerce\Discounts\DiscountFactory;
 use SilverCommerce\Postage\Forms\PostageForm;
 use SilverCommerce\OrdersAdmin\Model\Estimate;
 use SilverStripe\CMS\Controllers\ContentController;
+use SilverCommerce\Discounts\Forms\DiscountCodeForm;
 use SilverCommerce\ShoppingCart\ShoppingCartFactory;
 
 /**
@@ -373,24 +375,10 @@ class ShoppingCart extends Controller
      */
     public function DiscountForm()
     {
-        $form = Form::create(
+        $form = DiscountCodeForm::create(
             $this,
             "DiscountForm",
-            FieldList::create(
-                TextField::create(
-                    "DiscountCode",
-                    _t("ShoppingCart.DiscountCode", "Discount Code")
-                )->setAttribute(
-                    "placeholder",
-                    _t("ShoppingCart.EnterDiscountCode", "Enter a discount code")
-                )
-            ),
-            FieldList::create(
-                FormAction::create(
-                    'doAddDiscount',
-                    _t('ShoppingCart.Add', 'Add')
-                )->addExtraClass('btn btn-info')
-            )
+            ShoppingCartFactory::create()->getCurrent()
         );
         
         $this->extend("updateDiscountForm", $form);
@@ -473,23 +461,4 @@ class ShoppingCart extends Controller
         return $this->redirectBack();
     }
     
-    /**
-     * Action that will find a discount based on the code
-     *
-     * @param type $data
-     * @param type $form
-     */
-    public function doAddDiscount($data, $form)
-    {
-        $code_to_search = $data['DiscountCode'];
-        
-        // First check if the discount is already added (so we don't
-        // query the DB if we don't have to).
-        if ($this->getDiscount()->Code != $code_to_search) {
-            $this->setDiscount($code_to_search);
-            ShoppingCartFactory::create()->save();
-        }
-        
-        return $this->redirectBack();
-    }
 }

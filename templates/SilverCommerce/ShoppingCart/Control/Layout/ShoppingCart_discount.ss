@@ -1,6 +1,6 @@
 <div class="content-container container typography checkout-cart">
 
-    <% if $Discount %>
+    <% if $Discounts %>
         <h1><%t Checkout.DiscountAdded 'Discount Added' %></h1>
 
         <% if $Discount.Type == 'Percentage' %>

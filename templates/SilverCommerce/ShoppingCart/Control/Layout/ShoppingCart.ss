@@ -46,16 +46,21 @@
                         </td>
                     </tr>
                     
-                    <% if $Discount.exists %>
+                    <% if $Discounts.exists %>
                         <tr class="discount">
                             <td class="text-right">
                                 <strong>
-                                    <%t SilverCommercec\ShoppingCart.Discount 'Discount' %>
-                                </strong><br/>
-                                ($Discount.Title)
+                                    <%t SilverCommercec\ShoppingCart.Discounts 'Discounts' %>
+                                </strong><br />
+                                <% loop $Discounts %>
+                                    <small class="text-muted">$Title</small><% if not $Last %><br /><% end_if %>
+                                <% end_loop %>
                             </td>
                             <td class="text-right">
-                                {$DiscountAmount.Nice}
+                                $DiscountAmount.Nice<br />
+                                <% loop $Discounts %>
+                                    <small class="text-muted">$Value.Nice</small><% if not $Last %><br /><% end_if %>
+                                <% end_loop %>
                             </td>
                         </tr>
                     <% end_if %>

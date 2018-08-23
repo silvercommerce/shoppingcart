@@ -90,8 +90,11 @@ class ShoppingCartFactory
         
         // If we don't have any discounts, a user is logged in and he has
         // access to discounts through a group, add the discount here
-        if (!$cart->getDiscount()->exists() && $member && $member->getDiscount()) {
-            $cart->DiscountCode = $member->getDiscount()->Code;
+        if (!$cart->Discounts()->Count() > 0 && $member && $member->getDiscount()) {
+            $discount = $member->getDiscount();
+            if ($discount->exists()) {
+                $cart->addDiscount($discount);
+            }
         }
 
         if (!$this->config()->cron_cleaner) {
@@ -406,6 +409,7 @@ class ShoppingCartFactory
         $cookies = $this->cookiesSupported();
         $member = Security::getCurrentUser();
         $cart = $this->getCurrent();
+        $cart->recalculateDiscounts();
         $cart->write();
 
         // If the cart exists and the current user's cart doesn't
