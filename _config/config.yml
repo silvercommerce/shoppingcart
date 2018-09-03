@@ -1,10 +1,12 @@
 ---
 Name: shoppingcartconfig
+After:
+  - '#contactsconfig'
 ---
 ## Extra DB fields
 SilverStripe\Security\Member:
-  has_one:
-    Cart: SilverCommerce\ShoppingCart\Model\ShoppingCart
+  extensions:
+    - SilverCommerce\ShoppingCart\Extensions\MemberExtension
 
 ## Manage shopping carts from orders admin
 SilverCommerce\OrdersAdmin\Admin\OrderAdmin:

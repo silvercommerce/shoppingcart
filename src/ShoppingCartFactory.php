@@ -87,7 +87,7 @@ class ShoppingCartFactory
         $member = Security::getCurrentUser();
 
         $cart = $this->findOrMakeCart();
-        
+
         // If we don't have any discounts, a user is logged in and he has
         // access to discounts through a group, add the discount here
         if (!$cart->Discounts()->Count() > 0 && $member && $member->getDiscount()) {
@@ -141,8 +141,8 @@ class ShoppingCartFactory
         }
 
         // Does the current member have a cart?
-        if (empty($cart) && isset($member) && $member->Cart()->exists()) {
-            $cart = $member->Cart();
+        if (empty($cart) && isset($member) && $member->getCart()) {
+            $cart = $member->getCart();
         }
 
         // Finally, if nothing is set, create a new instance to return
@@ -296,10 +296,10 @@ class ShoppingCartFactory
                 }
             }
 
-            $cart
-                ->Items()
-                ->add($item);
+            $item->ParentID = $cart->ID;
+            $item->write();
         }
+    
         $this->save();
 
         return $this;
@@ -407,22 +407,16 @@ class ShoppingCartFactory
     public function save()
     {
         $cookies = $this->cookiesSupported();
+        $session = $this->getSession();
         $member = Security::getCurrentUser();
         $cart = $this->getCurrent();
         $cart->recalculateDiscounts();
-        $cart->write();
 
         // If the cart exists and the current user's cart doesn't
         // match, they have just logged in, replace their cart with
         // the new one.
-        if ($cart->exists() && isset($member) && $member->Cart() != $cart) {
-            // Remove existing cart
-            if ($member->Cart()->exists()) {
-                $member->Cart()->delete();
-            }
-
-            $member->CartID = $cart->ID;
-            $member->write();
+        if ($cart->exists() && isset($member) && $member->getCart() != $cart) {
+            $member->setCart($cart);
 
             if ($cookies) {
                 Cookie::force_expiry(self::COOKIE_NAME);
@@ -431,10 +425,11 @@ class ShoppingCartFactory
             }
         }
 
+        $cart->write();
+
         if (!$member && $cookies) {
             Cookie::set(self::COOKIE_NAME, $cart->AccessKey);
         } elseif (!$member) {
-            $session = $this->getSession();
             $session->set(self::COOKIE_NAME, $cart->AccessKey);
         }
 
