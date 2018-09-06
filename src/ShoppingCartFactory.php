@@ -392,7 +392,7 @@ class ShoppingCartFactory
         if ($cookies) {
             Cookie::force_expiry(self::COOKIE_NAME);
         } else {
-            $session->clear(self::COOKIE_NAME);
+            $this->getSession()->clear(self::COOKIE_NAME);
         }
 
         return $this;
