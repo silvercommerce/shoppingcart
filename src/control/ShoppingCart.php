@@ -20,6 +20,7 @@ use SilverCommerce\Checkout\Control\Checkout;
 use SilverCommerce\Discounts\DiscountFactory;
 use SilverCommerce\Postage\Forms\PostageForm;
 use SilverCommerce\OrdersAdmin\Model\Estimate;
+use SilverCommerce\Discounts\Model\AppliedDiscount;
 use SilverStripe\CMS\Controllers\ContentController;
 use SilverCommerce\Discounts\Forms\DiscountCodeForm;
 use SilverCommerce\ShoppingCart\ShoppingCartFactory;
@@ -98,6 +99,7 @@ class ShoppingCart extends Controller
         "usediscount",
         "setdeliverytype",
         "checkout",
+        'removediscount',
         "CartForm",
         "PostageForm",
         "DiscountForm"
@@ -328,6 +330,20 @@ class ShoppingCart extends Controller
         $this->extend("onBeforeCheckout");
 
         $this->redirect($checkout->Link());
+    }
+
+    public function removediscount()
+    {
+        $id = $this->request->param('ID');
+
+        $discount = AppliedDiscount::get()->byID($id);
+
+        if ($discount->exists()) {
+            $discount->delete();
+        }
+
+        $this->redirectBack();
+
     }
     
     /**

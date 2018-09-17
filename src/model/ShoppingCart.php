@@ -52,4 +52,5 @@ class ShoppingCart extends Estimate
             $this->Link($action)
         );
     }
+
 }

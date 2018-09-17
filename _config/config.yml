@@ -22,3 +22,6 @@ SilverStripe\Control\Controller:
 SilverStripe\SiteConfig\SiteConfig:
   extensions:
     - SilverCommerce\ShoppingCart\Extensions\SiteConfigExtension
+SilverCommerce\Discounts\Model\AppliedDiscount:
+  extensions:
+    - SilverCommerce\ShoppingCart\Extensions\AppliedDiscountExtension

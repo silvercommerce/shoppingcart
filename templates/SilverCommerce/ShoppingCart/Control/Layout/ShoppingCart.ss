@@ -15,6 +15,14 @@
                 <% if $SiteConfig.ShowCartDiscountForm %>
                     <div class="checkout-cart-discounts line units-row end">
                         $DiscountForm
+                        <% loop $Discounts %>
+                            <ul class="list-unstyled">
+                                <span class="text-muted">
+                                    $Title: $Value.Nice 
+                                    <a class="pl-2" href="$RemoveLink"><i class="fas fa-window-close"></i></a>
+                                </span>
+                            </p>
+                        <% end_loop %>
                     </div>
                     
                     <hr/>
@@ -51,16 +59,10 @@
                             <td class="text-right">
                                 <strong>
                                     <%t SilverCommercec\ShoppingCart.Discounts 'Discounts' %>
-                                </strong><br />
-                                <% loop $Discounts %>
-                                    <small class="text-muted">$Title</small><% if not $Last %><br /><% end_if %>
-                                <% end_loop %>
+                                </strong>
                             </td>
                             <td class="text-right">
-                                $DiscountTotal.Nice<br />
-                                <% loop $Discounts %>
-                                    <small class="text-muted">$Value.Nice</small><% if not $Last %><br /><% end_if %>
-                                <% end_loop %>
+                                $DiscountTotal.Nice
                             </td>
                         </tr>
                     <% end_if %>
