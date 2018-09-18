@@ -70,6 +70,14 @@ class ShoppingCartFactory
     private static $cron_cleaner = false;
 
     /**
+     * Allow the user to add multiple discounts to the cart
+     *
+     * @var boolean
+     * @config
+     */
+    private static $allow_multi_discounts = true;
+
+    /**
      * The current shopping cart
      * 
      * @var ShoppingCart
