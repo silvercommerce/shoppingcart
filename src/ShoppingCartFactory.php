@@ -71,11 +71,12 @@ class ShoppingCartFactory
 
     /**
      * Allow the user to add multiple discounts to the cart
+     * 0 = unlimited
      *
-     * @var boolean
+     * @var int
      * @config
      */
-    private static $allow_multi_discounts = true;
+    private static $discount_limit = 1;
 
     /**
      * The current shopping cart
