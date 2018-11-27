@@ -345,6 +345,8 @@ class ShoppingCartFactory
         // If we need to track stock, do it now
         if ($stock_item && ($stock_item->Stocked || $this->config()->check_stock_levels)) {
             if ($item->checkStockLevel($quantity) < 0) {
+                $item->Quantity = $stock_item->StockLevel;
+                $item->write();
                 throw new ValidationException(_t(
                     "ShoppingCart.NotEnoughStock",
                     "There are not enough '{title}' in stock",
