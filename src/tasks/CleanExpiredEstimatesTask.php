@@ -63,7 +63,11 @@ class CleanExpiredEstimatesTask extends BuildTask
         $i = 0;
         foreach ($all as $cart) {
             // Is the cart currentyl assigned to a member?
-            $curr = Member::get()->find("CartID", $cart->ID);
+            if ($cart->ContactID) {
+                $curr = $cart->Contact()->Member();
+            } else {
+                $curr = false;
+            }
 
             if (empty($curr)) {
                 $cart->delete();
