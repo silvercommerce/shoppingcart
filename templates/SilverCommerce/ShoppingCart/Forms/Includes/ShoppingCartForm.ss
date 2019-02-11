@@ -34,7 +34,7 @@
 					<% loop $Controller.Items %>
 						<tr>
 							<td>
-								$Image.CroppedImage(75,75)
+								<img src="$Image.Fill(75,75).URL" alt="Image.Title">
 							</td>
 							<td>
 								<strong>
