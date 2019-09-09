@@ -10,7 +10,7 @@ class AppliedDiscountExtension extends DataExtension
 {
     public function RemoveLink()
     {
-        $cart = ShoppingCartFactory::create()->getCurrent();
+        $cart = ShoppingCartFactory::create()->getOrder();
 
         $controller = Controller::curr();
 

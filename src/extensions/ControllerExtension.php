@@ -21,6 +21,6 @@ class ControllerExtension extends Extension
      */
     public function getShoppingCart()
     {
-        return ShoppingCartFactory::create()->getCurrent();
+        return ShoppingCartFactory::create()->getOrder();
     }
 }

@@ -116,7 +116,7 @@ class ShoppingCart extends Controller
 
         // Setup current controller on init (as Security::getMember()
         // is not available on construction)
-        $dataRecord = ShoppingCartFactory::create()->getCurrent();
+        $dataRecord = ShoppingCartFactory::create()->getOrder();
         $this->setDataRecord($dataRecord);
         $this->setFailover($this->dataRecord);
 
@@ -248,7 +248,9 @@ class ShoppingCart extends Controller
 
         if (isset($item)) {
             $title = $item->Title;
-            ShoppingCartFactory::create()->removeItem($item);
+            ShoppingCartFactory::create()
+                ->removeItem($item->Key)
+                ->write();
 
             $form = $this->CartForm();
             $form->sessionMessage(_t(
@@ -286,7 +288,7 @@ class ShoppingCart extends Controller
      *
      */
     public function usediscount()
-    {   
+    {
         $code_to_search = $this->request->param("ID");
         $code = false;
         $curr = $this->getDiscount();
@@ -299,7 +301,7 @@ class ShoppingCart extends Controller
         // query the DB if we don't have to).
         if (!$curr || ($curr && $curr->Code != $code_to_search)) {
             $this->setDiscount($code_to_search);
-            ShoppingCartFactory::create()->save();
+            ShoppingCartFactory::create()->write();
         } elseif ($curr && $code->Code == $code_to_search) {
             $code = $this->getDiscount();
         }
@@ -365,7 +367,7 @@ class ShoppingCart extends Controller
      * @return Form
      */
     public function CartForm()
-    {   
+    {
         $form = Form::create(
             $this,
             "CartForm",
@@ -394,7 +396,7 @@ class ShoppingCart extends Controller
         $form = DiscountCodeForm::create(
             $this,
             "DiscountForm",
-            ShoppingCartFactory::create()->getCurrent()
+            ShoppingCartFactory::create()->getOrder()
         );
         
         $this->extend("updateDiscountForm", $form);
@@ -441,18 +443,20 @@ class ShoppingCart extends Controller
     public function doUpdate($data, $form)
     {
         try {
+            $factory = ShoppingCartFactory::create();
             foreach ($this->Items() as $item) {
                 foreach ($data as $key => $value) {
                     $sliced_key = explode("_", $key);
                     if ($sliced_key[0] == "Quantity") {
                         if (isset($item) && ($item->Key == $sliced_key[1])) {
                             if ($value > 0) {
-                                ShoppingCartFactory::create()->updateItem(
-                                    $item,
-                                    $value
+                                $factory->updateItem(
+                                    $item->Key,
+                                    $value,
+                                    false
                                 );
                             } else {
-                                $item->delete();
+                                $factory->removeItem($item->Key);
                             }
 
                             $form->sessionMessage(
@@ -463,7 +467,7 @@ class ShoppingCart extends Controller
                     }
                 }
             }
-            ShoppingCartFactory::create()->save();
+            $factory->write();
         } catch (ValidationException $e) {
             $form->sessionMessage(
                 $e->getMessage()
