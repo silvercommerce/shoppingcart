@@ -15,17 +15,12 @@
 						<th class="description">
 							<%t ShoppingCart.Description "Description" %>
 						</th>
-						<th class="quantity">
-							<%t ShoppingCart.Qty "Qty" %>
-						</th>
 						<th class="price">
 							<%t ShoppingCart.Price "Price" %>
 						</th>
-						<% if not $SiteConfig.ShowPriceAndTax %>
-							<th class="tax">
-								<%t ShoppingCart.Tax "Tax" %>
-							</th>
-						<% end_if %>
+						<th class="quantity">
+							<%t ShoppingCart.Qty "Qty" %>
+						</th>
 						<th class="actions"></th>
 					</tr>
 				</thead>
@@ -49,6 +44,9 @@
 									</div><% end_loop %>
 								</div><% end_if %>
 							</td>
+							<td class="price">
+								$getFormattedPrice($ShowPriceWithTax)
+							</td>
 							<td class="quantity">
 								<input
 									type="text"
@@ -60,18 +58,6 @@
 									<% end_if %>
 								/>
 							</td>
-							<td class="price">
-								<% if $Up.SiteConfig.ShowPriceAndTax %>
-									{$UnitTotal.Nice}
-								<% else %>
-									{$UnitPrice.Nice}
-								<% end_if %>
-							</td>
-							<% if not $Up.SiteConfig.ShowPriceAndTax %>
-								<td class="tax">
-									{$UnitTax.Nice}
-								</td>
-							<% end_if %>
 							<td class="remove">
 								<a href="{$Top.Controller.Link('remove')}/{$Key}" class="btn btn-red btn-danger">
 									x

@@ -4,49 +4,44 @@
     <h1><%t SilverCommercec\ShoppingCart.CartName 'Shopping Cart' %></h1>
 
     <% if $Items.exists %>
-        <div class="shoppingcart-form">
-            $CartForm
-        </div>
-
-        <hr/>
-
         <div class="row line">
-            <div class="unit size2of3 col-xs-12 col-md-8">
-                <% if $SiteConfig.ShowCartDiscountForm %>
-                    <div class="checkout-cart-discounts line units-row end">
-                        $DiscountForm
-                        <% loop $Discounts %>
-                            <ul class="list-unstyled">
-                                <span class="text-muted">
-                                    $Title: $Value.Nice 
-                                    <a class="pl-2" href="$RemoveLink"><i class="fas fa-window-close"></i></a>
-                                </span>
-                            </p>
-                        <% end_loop %>
-                    </div>
-                    
-                    <hr/>
-                <% end_if %>
+            <div class="unit size2of3 col col-xs-12 col-lg-8">
+                <div class="shoppingcart-form">
+                    $CartForm
 
-                <% if isDeliverable %>
-                    <div class="row line">
-                        <% if $SiteConfig.ShowCartPostageForm && $PostageForm %>
-                            <div class="size10f2 col-xs-12 col-sm-6 checkout-cart-postage">
-                                $PostageForm
-                            </div>
-                        <% else %>
-                            <br/>
-                        <% end_if %>
-                    </div>
-                <% end_if %>
+                    <hr/>
+                </div>
+
+                <div class="row">
+                    <% if $SiteConfig.ShowCartDiscountForm %>
+                        <div class="checkout-cart-discounts unit col-xs-12 col-lg-6">
+                            $DiscountForm
+
+                            <% loop $Discounts %>
+                                <ul class="list-unstyled">
+                                    <span class="text-muted">
+                                        $Title: $Value.Nice 
+                                        <a class="pl-2" href="$RemoveLink"><i class="fas fa-window-close"></i></a>
+                                    </span>
+                                </p>
+                            <% end_loop %>
+                        </div>
+                    <% end_if %>
+
+                    <% if isDeliverable && $SiteConfig.ShowCartPostageForm && $PostageForm %>
+                        <div class="checkout-cart-postage unit col-xs-12 col-lg-6">
+                            $PostageForm
+                        </div>
+                    <% end_if %>
+                </div>
             </div>
 
-            <div class="unit size1of3 col-xs-12 col-md-4">
+            <div class="unit size1of3 col-xs-12 col-lg-4">
                 <table class="shoppingcart-total-table table">
                     <tr class="subtotal">
                         <td class="text-right">
                             <strong>
-                                <%t SilverCommercec\ShoppingCart.SubTotal 'Sub Total' %>
+                                <%t SilverCommerce\ShoppingCart.SubTotal 'Sub Total' %>
                             </strong>
                         </td>
                         <td class="text-right">
@@ -58,11 +53,11 @@
                         <tr class="discount">
                             <td class="text-right">
                                 <strong>
-                                    <%t SilverCommercec\ShoppingCart.Discounts 'Discounts' %>
+                                    <%t SilverCommerce\ShoppingCart.Discounts 'Discounts' %>
                                 </strong>
                             </td>
                             <td class="text-right">
-                                $DiscountTotal.Nice
+                                {$DiscountTotal}
                             </td>
                         </tr>
                     <% end_if %>
@@ -71,11 +66,11 @@
                         <tr class="shipping">
                             <td class="text-right">
                                 <strong>
-                                    <%t SilverCommercec\ShoppingCart.Postage 'Postage' %>
+                                    <%t SilverCommerce\ShoppingCart.Postage 'Postage' %>
                                 </strong>
                             </td>
                             <td class="text-right">
-                                {$PostagePrice.Nice}
+                                {$PostagePrice}
                             </td>
                         </tr>
                     <% end_if %>
