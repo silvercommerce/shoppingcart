@@ -28,8 +28,13 @@
           "silverstripe/framework": "~4.0",
           "silvercommerce/settings": "~1.0",
           "silvercommerce/orders-admin": "~1.0",
-          "silvercommerce/discounts": "1.*@dev",
+          "silvercommerce/discounts": "~1.0",
           "silvercommerce/postage": "~1.0"
+      },
+      "require-dev": {
+        "silvercommerce/tax-admin": "1.*@dev",
+        "phpunit/phpunit": "^5.7",
+        "squizlabs/php_codesniffer": "^3.0"
       },
       "extra": {
           "expose": [
@@ -43,9 +48,10 @@
           }
       },
       "scripts": {
-          "lint": "phpcs -s src/ tests/",
-          "lint-clean": "phpcbf src/ tests/"
+          "lint": "vendor/bin/phpcs src/ tests/",
+          "lint-clean": "vendor/bin/phpcbf src/ tests/"
       },
-      "minimum-stability": "dev"
+      "minimum-stability": "dev",
+      "prefer-stable": true
   }
   
