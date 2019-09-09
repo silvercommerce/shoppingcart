@@ -2,32 +2,24 @@
 
 namespace SilverCommerce\ShoppingCart;
 
-use SilverStripe\Dev\Debug;
 use SilverStripe\Control\Cookie;
 use SilverStripe\Security\Security;
 use SilverStripe\Control\HTTPRequest;
 use SilverStripe\SiteConfig\SiteConfig;
 use SilverStripe\Core\Injector\Injector;
-use SilverStripe\ORM\ValidationException;
-use SilverStripe\Core\Config\Configurable;
-use SilverStripe\Core\Injector\Injectable;
 use SilverStripe\ORM\FieldType\DBDatetime;
-use SilverCommerce\OrdersAdmin\Model\LineItem;
-use SilverCommerce\OrdersAdmin\Model\LineItemCustomisation;
 use SilverCommerce\ShoppingCart\Tasks\CleanExpiredEstimatesTask;
 use SilverCommerce\ShoppingCart\Model\ShoppingCart as ShoppingCartModel;
 use SilverCommerce\ShoppingCart\Control\ShoppingCart as ShoppingCartController;
+use SilverCommerce\OrdersAdmin\Factory\OrderFactory;
 
 /**
  * Factory to handle setting up and interacting with a ShoppingCart
  * object.
- * 
+ *
  */
-class ShoppingCartFactory
+class ShoppingCartFactory extends OrderFactory
 {
-    use Injectable;
-    use Configurable;
-
     /**
      * Name of the test cookie used to check if cookies are allowed
      */
@@ -43,7 +35,7 @@ class ShoppingCartFactory
      * 
      * @var string
      */
-    private static $model = ShoppingCartModel::class;
+    private static $estimate_class = ShoppingCartModel::class;
 
     /**
      * The default class that is used by the factroy
@@ -79,11 +71,13 @@ class ShoppingCartFactory
     private static $discount_limit = 1;
 
     /**
-     * The current shopping cart
-     * 
-     * @var ShoppingCart
+     * Should a cookie be used to track a link to a cart (so it persists
+     * between browser sessions)?
+     *
+     * @var boolean
+     * @config
      */
-    protected $current;
+    private static $use_cookies = false;
 
     /**
      * Setup the shopping cart and return an instance
@@ -92,10 +86,9 @@ class ShoppingCartFactory
      **/ 
     public function __construct()
     {
-        $cookies = $this->cookiesSupported();
         $member = Security::getCurrentUser();
-
-        $cart = $this->findOrMakeCart();
+        $this->setIsInvoice(false);
+        $cart = $this->findOrMake();
 
         // If we don't have any discounts, a user is logged in and he has
         // access to discounts through a group, add the discount here
@@ -110,7 +103,17 @@ class ShoppingCartFactory
             $this->cleanOld();
         }
 
-        $this->current = $cart;
+        $this->order = $cart;
+    }
+
+    /**
+     * Legacy get current method
+     * 
+     * @return \SilverCommerce\OrdersAdmin\Model\Estimate
+     */
+    public function getCurrent()
+    {
+        return $this->getOrder();
     }
 
     /**
@@ -129,13 +132,12 @@ class ShoppingCartFactory
      * 
      * @return ShoppingCartModel
      */
-    public function findOrMakeCart()
+    public function findOrMake()
     {
         $cookies = $this->cookiesSupported();
         $session = $this->getSession();
-        $classname = self::config()->model;
+        $classname = self::config()->get("estimate_class");
         $cart = null;
-        $write = false;
         $member = Security::getCurrentUser();
 
         if ($cookies) {
@@ -157,6 +159,11 @@ class ShoppingCartFactory
         // Finally, if nothing is set, create a new instance to return
         if (empty($cart)) {
             $cart = $classname::create();
+
+            // Add new cart to current member (if existing)
+            if (!empty($member)) {
+                $member->setCart($cart);
+            }
         }
 
         return $cart;
@@ -164,8 +171,8 @@ class ShoppingCartFactory
 
     /**
      * Run the task to clean old shopping carts
-     * 
-     * @return null 
+     *
+     * @return null
      */
     public function cleanOld()
     {
@@ -183,207 +190,25 @@ class ShoppingCartFactory
     }
 
     /**
-     * Test to see if the current user supports cookies
+     * Test to see if a cookie should be used, or
+     * the current user supports cookies
      * 
      * @return boolean
      */
     public function cookiesSupported()
     {
+        $use_cookies = $this->config()->use_cookies;
+
+        if (!$use_cookies) {
+            return false;
+        }
+
         Cookie::set(self::TEST_COOKIE, 1);
         $cookie = Cookie::get(self::TEST_COOKIE);
         Cookie::force_expiry(self::TEST_COOKIE);
 
         return (empty($cookie)) ? false : true;
     }
-
-    /**
-     * Get the current shopping cart
-     * 
-     * @return ShoppingCart
-     */ 
-    public function getCurrent()
-    {
-        return $this->current;
-    }
-
-    /**
-     * Add an item to the shopping cart. By default this should be a
-     * line item, but this method will determine if the correct object
-     * has been provided before attempting to add.
-     *
-     * @param array $item The item to add (defaults to @link LineItem)
-     * @param array $customisations (A list of @LineItemCustomisations customisations to provide)
-     * 
-     * @throws ValidationException
-     * @return self
-     */
-    public function addItem($item, $customisations = [])
-    {
-        $cart = $this->getCurrent();
-        $stock_item = $item->FindStockItem();
-        $added = false;
-
-        if (!$item instanceof LineItem) {
-            throw new ValidationException(_t(
-                "ShoppingCart.WrongItemClass",
-                "Item needs to be of class {class}",
-                ["class" => LineItem::class]
-            ));
-        }
-
-        // Start off by writing our item object (if it is
-        // not in the DB)
-        if (!$item->exists()) {
-            $item->write();
-        }
-
-        if (!is_array($customisations)) {
-            $customisations = [$customisations];
-        }
-
-        // Find any item customisation associations
-        $custom_association = null;
-        $custom_associations = array_merge(
-            $item->hasMany(),
-            $item->manyMany()
-        );
-
-        // Define association of item to customisations
-        foreach ($custom_associations as $key => $value) {
-            $class = $value::create();
-            if ($class instanceof LineItemCustomisation) {
-                $custom_association = $key;
-                break;
-            }
-        }
-
-
-        // Map any customisations to the current item
-        if (isset($custom_association)) {
-            $item->write();
-            foreach ($customisations as $customisation) {
-                if ($customisation instanceof LineItemCustomisation) {
-                    if (!$customisation->exists()) {
-                        $customisation->write();
-                    }
-                    $item->{$custom_association}()->add($customisation);
-                }
-            }
-        }
-        
-        // Ensure we update the item key
-        $item->write();
-
-        // If the current cart isn't in the DB, save it
-        if (!$cart->exists()) {
-            $this->save();
-        }
-
-        // Check if object already in the cart, update quantity
-        // and delete new item
-        $existing_item = $cart->Items()->find("Key", $item->Key);
-
-        if (isset($existing_item)) {
-            $this->updateItem(
-                $existing_item,
-                $existing_item->Quantity + $item->Quantity
-            );
-            $item->delete();
-            $added = true;
-        }
-
-        // If no update was sucessfull then add item
-        if (!$added) {
-            // If we need to track stock, do it now
-            if ($stock_item && ($stock_item->Stocked || $this->config()->check_stock_levels)) {
-                if ($item->checkStockLevel($item->Quantity) < 0) {
-                    throw new ValidationException(_t(
-                        "ShoppingCart.NotEnoughStock",
-                        "There are not enough '{title}' in stock",
-                        ['title' => $stock_item->Title]
-                    ));
-                }
-            }
-
-            $item->ParentID = $cart->ID;
-            $item->write();
-        }
-    
-        $this->save();
-
-        return $this;
-    }
-
-    /**
-     * Find an existing item and update its quantity
-     *
-     * @param LineItem $item     the item in the cart to update
-     * @param int      $quantity the new quantity
-     * 
-     * @throws ValidationException
-     * @return self
-     */
-    public function updateItem($item, $quantity)
-    {
-        $stock_item = $item->FindStockItem();
-
-        if (!$item instanceof LineItem) {
-            throw new ValidationException(_t(
-                "ShoppingCart.WrongItemClass",
-                "Item needs to be of class {class}",
-                ["class" => LineItem::class]
-            ));
-        }
-        
-        if ($item->Locked) {
-            throw new ValidationException(_t(
-                "ShoppingCart.UnableToEditItem",
-                "Unable to change item's quantity"
-            ));
-        }
-
-        // If we need to track stock, do it now
-        if ($stock_item && ($stock_item->Stocked || $this->config()->check_stock_levels)) {
-            if ($item->checkStockLevel($quantity) < 0) {
-                $item->Quantity = $stock_item->StockLevel;
-                $item->write();
-                throw new ValidationException(_t(
-                    "ShoppingCart.NotEnoughStock",
-                    "There are not enough '{title}' in stock",
-                    ['title' => $stock_item->Title]
-                ));
-            }
-        }
-        
-        $item->Quantity = floor($quantity);
-        $item->write();
-        
-        return $this;
-    }
-
-    /**
-     * Remove a LineItem from ShoppingCart
-     *
-     * @param LineItem $item The item to remove
-     * 
-     * @return self
-     */
-    public function removeItem($item)
-    {
-        if (!$item instanceof LineItem) {
-            throw new ValidationException(_t(
-                "ShoppingCart.WrongItemClass",
-                "Item needs to be of class {class}",
-                ["class" => LineItem::class]
-            ));
-        }
-
-        $item->delete();
-        $this->save();
-
-        return $this;
-    }
-
 
     /**
      * Destroy current shopping cart
@@ -393,7 +218,7 @@ class ShoppingCartFactory
     public function delete()
     {
         $cookies = $this->cookiesSupported();
-        $cart = $this->getCurrent();
+        $cart = $this->getOrder();
 
         // Only delete the cart if it has been written to the DB
         if ($cart->exists()) {
@@ -415,12 +240,12 @@ class ShoppingCartFactory
      *
      * @return self
      */
-    public function save()
+    public function write()
     {
         $cookies = $this->cookiesSupported();
         $session = $this->getSession();
         $member = Security::getCurrentUser();
-        $cart = $this->getCurrent();
+        $cart = $this->getOrder();
         $cart->recalculateDiscounts();
 
         // If the cart exists and the current user's cart doesn't
@@ -445,5 +270,15 @@ class ShoppingCartFactory
         }
 
         return $this;
+    }
+
+    /**
+     * Shortcut for write
+     *
+     * @return self
+     */
+    public function save()
+    {
+        return $this->write();
     }
 }
