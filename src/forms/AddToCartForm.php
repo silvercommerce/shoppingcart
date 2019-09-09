@@ -11,7 +11,6 @@ use SilverStripe\Core\Config\Config;
 use SilverStripe\Forms\RequiredFields;
 use SilverStripe\ORM\ValidationResult;
 use SilverStripe\Control\RequestHandler;
-use SilverCommerce\OrdersAdmin\Model\LineItem;
 use SilverCommerce\ShoppingCart\ShoppingCartFactory;
 use SilverCommerce\QuantityField\Forms\QuantityField;
 use SilverCommerce\ShoppingCart\Control\ShoppingCart;
@@ -28,14 +27,19 @@ class AddToCartForm extends Form
      */
     const DEFAULT_NAME = "AddToCartForm";
 
-    public function __construct(RequestHandler $controller = null, $name = self::DEFAULT_NAME, FieldList $fields = null, FieldList $actions = null, Validator $validator = null)
-    {
+    public function __construct(
+        RequestHandler $controller = null,
+        $name = self::DEFAULT_NAME,
+        FieldList $fields = null,
+        FieldList $actions = null,
+        Validator $validator = null
+    ) {
         $base_fields = FieldList::create(
             HiddenField::create('ID'),
             HiddenField::create('ClassName'),
             QuantityField::create(
                 'Quantity',
-                _t('ShoppingCart.Qty','Qty')
+                _t('ShoppingCart.Qty', 'Qty')
             )
         );
 
@@ -48,7 +52,7 @@ class AddToCartForm extends Form
         $base_actions = FieldList::create(
             FormAction::create(
                 'doAddItemToCart',
-                _t('Catalogue.AddToCart','Add to Cart')
+                _t('Catalogue.AddToCart', 'Add to Cart')
             )->addExtraClass('btn btn-primary')
         );
 
@@ -143,36 +147,19 @@ class AddToCartForm extends Form
     {
         $classname = $data["ClassName"];
         $id = $data["ID"];
+        $object = $classname::get()->byID($id);
         $cart = ShoppingCartFactory::create();
         $error = false;
         $redirect_to_cart = Config::inst()
             ->get(ShoppingCart::class, "redirect_on_add");
 
-        if ($object = $classname::get()->byID($id)) {
-            // Attempt to get tax rate from object
-            // On a Product this is handleed via casting
-            // But could be a direct association as well.
-            $tax_id = $object->TaxID;
-
-            $deliverable = (isset($object->Deliverable)) ? $object->Deliverable : true;
-            
-            $item_to_add = LineItem::create([
-                "Title" => $object->Title,
-                "Content" => $object->Content,
-                "Price" => $object->Price,
-                "Quantity" => $data['Quantity'],
-                "StockID" => $object->StockID,
-                "Weight" => $object->Weight,
-                "ProductClass" => $object->ClassName,
-                "Stocked" => $object->Stocked,
-                "Deliverable" => $deliverable,
-                "TaxID" => $tax_id,
-            ]);
-
+        if (!empty($object)) {
             // Try and add item to cart, return any exceptions raised
             // as a message
             try {
-                $cart->addItem($item_to_add);
+                $cart
+                    ->addItem($object, $data['Quantity'])
+                    ->write();
 
                 $message = _t(
                     'ShoppingCart.AddedItemToCart',
@@ -184,7 +171,7 @@ class AddToCartForm extends Form
                     $message,
                     ValidationResult::TYPE_GOOD
                 );
-            } catch(Exception $e) {
+            } catch (Exception $e) {
                 $error = true;
                 $this->sessionMessage(
                     $e->getMessage()
