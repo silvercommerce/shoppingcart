@@ -2,16 +2,14 @@
 
 namespace SilverCommerce\ShoppingCart\Tests;
 
-use SilverStripe\ORM\DataList;
 use SilverStripe\Control\Cookie;
 use SilverStripe\Control\Session;
 use SilverStripe\Dev\SapphireTest;
 use SilverStripe\Control\HTTPRequest;
 use SilverStripe\Core\Injector\Injector;
-use SilverStripe\ORM\FieldType\DBDatetime;
-use SilverCommerce\Discounts\DiscountFactory;
-use SilverCommerce\ShoppingCart\ShoppingCartFactory;
 use SilverCommerce\OrdersAdmin\Model\LineItem;
+use SilverCommerce\ShoppingCart\ShoppingCartFactory;
+use SilverCommerce\ShoppingCart\Tests\Model\TestProduct;
 
 class ShoppingCartFactoryTest extends SapphireTest
 {
@@ -21,6 +19,15 @@ class ShoppingCartFactoryTest extends SapphireTest
      * @var string
      */
     protected static $fixture_file = 'ShoppingCart.yml';
+
+    /**
+     * Setup test only objects
+     *
+     * @var array
+     */
+    protected static $extra_dataobjects = [
+        TestProduct::class
+    ];
 
     public function setUp()
     {
@@ -44,7 +51,7 @@ class ShoppingCartFactoryTest extends SapphireTest
     {
         Cookie::set(ShoppingCartFactory::COOKIE_NAME, "abc123");
 
-        $cart = ShoppingCartFactory::create()->getCurrent();
+        $cart = ShoppingCartFactory::create()->getOrder();
 
         $this->assertEquals("abc123", $cart->AccessKey);
     }
@@ -58,15 +65,17 @@ class ShoppingCartFactoryTest extends SapphireTest
     {
         Cookie::set(ShoppingCartFactory::COOKIE_NAME, "abc123");
 
-        $item = LineItem::create([
-            "Title" => "A stock item",
-            "Price" => 5.99,
-            "Quantity" => 2
-        ]);
+        $product = TestProduct::create(
+            [
+                "Title" => "A stock item",
+                "PriceAmount" => 5.99
+            ]
+        );
+        $product->write();
 
         $cart = ShoppingCartFactory::create()
-            ->addItem($item)
-            ->getCurrent();
+            ->addItem($product, 2)
+            ->getOrder();
 
         $this->assertEquals(1, $cart->Items()->count());
         $this->assertEquals(2, $cart->TotalItems);
@@ -85,23 +94,26 @@ class ShoppingCartFactoryTest extends SapphireTest
 
         $cart = ShoppingCartFactory::create();
         $item = $cart->getCurrent()->Items()->first();
-        $cart = $cart->updateItem($item, 2)->getCurrent();
+        $cart = $cart->updateItem($item->Key, 2)->getOrder();
 
         $this->assertEquals(1, $cart->Items()->count());
         $this->assertEquals(2, $cart->TotalItems);
         $this->assertEquals(11.98, $cart->Total);
     
         // Now test adding an new item that should update
-        $item = LineItem::create([
-            "Title" => "A cheap item",
-            "Price" => 5.99,
-            "Quantity" => 1,
-            "StockID" => "Item1"
-        ]);
+        $product = TestProduct::create(
+            [
+                "Title" => "A cheap item",
+                "Price" => 5.99,
+                "Quantity" => 1,
+                "StockID" => "Item1"
+            ]
+        );
+        $product->write();
 
         $cart = ShoppingCartFactory::create()
-            ->addItem($item)
-            ->getCurrent();
+            ->addItem($product)
+            ->getOrder();
 
         $this->assertEquals(1, $cart->Items()->count());
         $this->assertEquals(3, $cart->TotalItems);
@@ -118,8 +130,8 @@ class ShoppingCartFactoryTest extends SapphireTest
         Cookie::set(ShoppingCartFactory::COOKIE_NAME, "123abc");
 
         $cart = ShoppingCartFactory::create();
-        $item = $cart->getCurrent()->Items()->first();
-        $cart = $cart->removeItem($item)->getCurrent();
+        $item = $cart->getOrder()->Items()->first();
+        $cart = $cart->removeItem($item->Key)->getOrder();
 
         $this->assertEquals(0, $cart->Items()->count());
         $this->assertEquals(0, $cart->TotalItems);
@@ -136,7 +148,7 @@ class ShoppingCartFactoryTest extends SapphireTest
 
         $cart = ShoppingCartFactory::create()->delete();
 
-        $this->assertFalse($cart->getCurrent()->exists());
+        $this->assertFalse($cart->getOrder()->exists());
     }
 
     /**
@@ -144,11 +156,11 @@ class ShoppingCartFactoryTest extends SapphireTest
      * 
      * @return null
      */
-    public function testSave()
+    public function testWrite()
     {
         $cart = ShoppingCartFactory::create()
-            ->save()
-            ->getCurrent();
+            ->write()
+            ->getOrder();
 
         $this->assertTrue($cart->exists());
     }
