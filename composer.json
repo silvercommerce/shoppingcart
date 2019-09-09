@@ -32,7 +32,7 @@
           "silvercommerce/postage": "~1.0"
       },
       "require-dev": {
-        "silvercommerce/taxable-currency": "1.*@dev",
+        "silvercommerce/tax-admin": "1.*@dev",
         "phpunit/phpunit": "^5.7",
         "squizlabs/php_codesniffer": "^3.0"
       },
