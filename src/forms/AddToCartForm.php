@@ -174,6 +174,8 @@ class AddToCartForm extends Form
             try {
                 $cart->addItem($item_to_add);
 
+                $this->extend('updateAddItemToCart', $item_to_add, $cart);
+
                 $message = _t(
                     'ShoppingCart.AddedItemToCart',
                     'Added "{item}" to your shopping cart',
