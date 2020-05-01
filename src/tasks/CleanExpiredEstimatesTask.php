@@ -12,7 +12,7 @@ use SilverCommerce\ShoppingCart\Model\ShoppingCart as ShoppingCart;
 /**
  * Simple task that removes estimates that have passed their end date
  * and are not assigned to a customer.
- * 
+ *
  * @author ilateral (http://www.ilateral.co.uk)
  * @package shoppingcart
  */
@@ -25,7 +25,7 @@ class CleanExpiredEstimatesTask extends BuildTask
     protected $enabled = true;
 
     /**
-     * Should this task output commands 
+     * Should this task output commands
      *
      * @var boolean
      */
@@ -51,7 +51,8 @@ class CleanExpiredEstimatesTask extends BuildTask
         return $this;
     }
 
-    function run($request) {
+    function run($request)
+    {
         $now = new DateTime();
         $days = Estimate::config()->default_end;
         $past = $now->modify("-{$days} days");
@@ -81,7 +82,7 @@ class CleanExpiredEstimatesTask extends BuildTask
     private function log($message)
     {
         if (!$this->silent) {
-            if(Director::is_cli()) {
+            if (Director::is_cli()) {
                 echo $message . "\n";
             } else {
                 echo $message . "<br/>";

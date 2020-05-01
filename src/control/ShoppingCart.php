@@ -75,7 +75,7 @@ class ShoppingCart extends Controller
 
     /**
      * Redirect the user to the cart when an item is added?
-     * 
+     *
      * @var boolean
      */
     private static $redirect_on_add = false;
@@ -107,8 +107,8 @@ class ShoppingCart extends Controller
 
     /**
      * Overwrite default init to support subsites (if installed)
-     * 
-     * @return void 
+     *
+     * @return void
      */
     protected function init()
     {
@@ -345,7 +345,6 @@ class ShoppingCart extends Controller
         }
 
         $this->redirectBack();
-
     }
     
     /**
@@ -480,5 +479,4 @@ class ShoppingCart extends Controller
         
         return $this->redirectBack();
     }
-    
 }

@@ -26,20 +26,20 @@ class ShoppingCartFactory extends OrderFactory
     const TEST_COOKIE = "ShoppingCartFactoryTest";
 
     /**
-     * Name of Cookie/Session used to track cart access key 
+     * Name of Cookie/Session used to track cart access key
      */
     const COOKIE_NAME = "ShoppingCart.Key";
 
     /**
      * The default class that is used by the factroy
-     * 
+     *
      * @var string
      */
     private static $estimate_class = ShoppingCartModel::class;
 
     /**
      * The default class that is used by the factroy
-     * 
+     *
      * @var string
      */
     private static $controller = ShoppingCartController::class;
@@ -81,9 +81,9 @@ class ShoppingCartFactory extends OrderFactory
 
     /**
      * Setup the shopping cart and return an instance
-     * 
+     *
      * @return ShoppingCart
-     **/ 
+     **/
     public function __construct()
     {
         $member = Security::getCurrentUser();
@@ -108,7 +108,7 @@ class ShoppingCartFactory extends OrderFactory
 
     /**
      * Legacy get current method
-     * 
+     *
      * @return \SilverCommerce\OrdersAdmin\Model\Estimate
      */
     public function getCurrent()
@@ -118,7 +118,7 @@ class ShoppingCartFactory extends OrderFactory
 
     /**
      * Get the current session from the current request
-     * 
+     *
      * @return Session
      */
     public function getSession()
@@ -129,7 +129,7 @@ class ShoppingCartFactory extends OrderFactory
 
     /**
      * Either find an existing cart, or create a new one.
-     * 
+     *
      * @return ShoppingCartModel
      */
     public function findOrMake()
@@ -192,7 +192,7 @@ class ShoppingCartFactory extends OrderFactory
     /**
      * Test to see if a cookie should be used, or
      * the current user supports cookies
-     * 
+     *
      * @return boolean
      */
     public function cookiesSupported()
@@ -212,7 +212,7 @@ class ShoppingCartFactory extends OrderFactory
 
     /**
      * Destroy current shopping cart
-     * 
+     *
      * @return self
      */
     public function delete()

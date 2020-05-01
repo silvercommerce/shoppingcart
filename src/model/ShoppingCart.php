@@ -9,7 +9,7 @@ use SilverCommerce\OrdersAdmin\Model\Estimate;
 use SilverCommerce\ShoppingCart\Control\ShoppingCart as ShoppingCartController;
 
 /**
- * Custom version of an estimate that is be mapped to the ShoppingCartController 
+ * Custom version of an estimate that is be mapped to the ShoppingCartController
  */
 class ShoppingCart extends Estimate
 {
@@ -52,5 +52,4 @@ class ShoppingCart extends Estimate
             $this->Link($action)
         );
     }
-
 }

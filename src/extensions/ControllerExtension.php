@@ -16,7 +16,7 @@ class ControllerExtension extends Extension
 {
     /**
      * Get the current shoppingcart
-     * 
+     *
      * @return ShoppingCart
      */
     public function getShoppingCart()

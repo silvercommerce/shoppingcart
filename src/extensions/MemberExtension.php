@@ -7,13 +7,13 @@ use SilverCommerce\ShoppingCart\Model\ShoppingCart;
 
 /**
  * Customise Member objects
- * 
+ *
  */
 class MemberExtension extends DataExtension
 {
     /**
      * Get the currenty active shopping cart on a member
-     * 
+     *
      * @return ShoppingCart
      */
     public function getCart()
@@ -28,7 +28,7 @@ class MemberExtension extends DataExtension
     /**
      * Update the current cart. Also make sure no more than one is
      * set at any one time.
-     * 
+     *
      * @return self
      */
     public function setCart(ShoppingCart $cart)

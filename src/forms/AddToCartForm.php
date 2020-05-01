@@ -17,8 +17,8 @@ use SilverCommerce\ShoppingCart\Control\ShoppingCart;
 
 /**
  * Form dedicated to adding the selected item to cart.
- * 
- * This form is intended to be used 
+ *
+ * This form is intended to be used
  */
 class AddToCartForm extends Form
 {
@@ -87,7 +87,7 @@ class AddToCartForm extends Form
 
     /**
      * Get the classname of the product.
-     * 
+     *
      * @return string
      */
     public function getProductClass()
@@ -100,7 +100,7 @@ class AddToCartForm extends Form
 
     /**
      * Set the classname of the product to add
-     * 
+     *
      * @param $class Classname of product
      * @return self
      */
@@ -116,7 +116,7 @@ class AddToCartForm extends Form
 
     /**
      * Get the ID of the product.
-     * 
+     *
      * @return string
      */
     public function getProductID()
@@ -129,7 +129,7 @@ class AddToCartForm extends Form
 
     /**
      * Set the ID of the product to add
-     * 
+     *
      * @param $ID ID of product
      * @return self
      */
