@@ -59,7 +59,7 @@
 								/>
 							</td>
 							<td class="remove">
-								<a href="{$Top.Controller.Link('remove')}/{$Key}" class="btn btn-red btn-danger">
+								<a href="{$Top.Controller.Link('remove')}/{$Key}" class="btn btn-red btn-outline-danger">
 									x
 								</a>
 							</td>
@@ -70,13 +70,13 @@
 		</div>
     </fieldset>
 
-    <fieldset class="shoppingcart-actions Actions">
-		<div class="btn-group justify-content-end d-flex">
-			<a href="$Controller.Link('emptycart')" class="btn btn-red btn-danger">
+    <fieldset class="shoppingcart-actions Actions row justify-content-end">
+		<div class="btn-group justify-content-end d-flex col-md-6 align-self-end">
+			<a href="$Controller.Link('emptycart')" class="btn btn-outline-danger">
 				<%t ShoppingCart.CartEmpty "Empty Cart" %>
 			</a>
 			
-			$Actions.dataFieldByName(action_doUpdate).Field
+			$Actions.dataFieldByName(action_doUpdate).addExtraClass('btn btn-outline-info').removeExtraClass('btn-primary').Field
 		</div>
     </fieldset>
 </form>

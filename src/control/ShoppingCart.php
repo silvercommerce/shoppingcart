@@ -376,7 +376,7 @@ class ShoppingCart extends Controller
                 FormAction::create(
                     'doUpdate',
                     _t('ShoppingCart.UpdateCart', 'Update Cart')
-                )->addExtraClass('btn btn-info')
+                )
             )
         )->setTemplate("SilverCommerce\ShoppingCart\Forms\Includes\ShoppingCartForm");
         
