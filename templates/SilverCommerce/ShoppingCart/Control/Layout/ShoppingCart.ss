@@ -1,7 +1,7 @@
 <% require css('silvercommerce/shoppingcart: client/dist/css/shoppingcart.css') %>
 
 <div class="col-sm-12 content-container typography shoppingcart">
-    <h1><%t SilverCommercec\ShoppingCart.CartName 'Shopping Cart' %></h1>
+    <h1><%t SilverCommerce\ShoppingCart.CartName 'Shopping Cart' %></h1>
 
     <% if $Items.exists %>
         <div class="row line">
@@ -57,7 +57,7 @@
                                 </strong>
                             </td>
                             <td class="text-right">
-                                {$DiscountTotal}
+                                {$DiscountTotal.Nice}
                             </td>
                         </tr>
                     <% end_if %>
@@ -79,7 +79,7 @@
                         <tr class="tax">
                             <td class="text-right">
                                 <strong>
-                                    <%t SilverCommercec\ShoppingCart.Tax 'Tax' %>
+                                    <%t SilverCommerce\ShoppingCart.Tax 'Tax' %>
                                 </strong>
                             </td>
                             <td class="text-right">
@@ -91,7 +91,7 @@
                     <tr class="total lead text-success">
                         <td class="text-right">
                             <strong class="uppercase bold">
-                                <%t SilverCommercec\ShoppingCart.CartTotal 'Total' %>
+                                <%t SilverCommerce\ShoppingCart.CartTotal 'Total' %>
                             </strong>
                         </td>
                         <td class="text-right">
@@ -102,7 +102,7 @@
                 
                 <p class="checkout-cart-proceed line units-row end">
                     <a href="{$Link('checkout')}" class="btn btn-green btn-big btn-lg btn-success">
-                        <%t SilverCommercec\ShoppingCart.CartProceed 'Proceed to Checkout' %>
+                        <%t SilverCommerce\ShoppingCart.CartProceed 'Proceed to Checkout' %>
                     </a>
                 </p>
             </div>
@@ -110,7 +110,7 @@
     <% else %>
         <p>
             <strong>
-                <%t SilverCommercec\ShoppingCart.CartIsEmpty 'Your cart is currently empty' %>
+                <%t SilverCommerce\ShoppingCart.CartIsEmpty 'Your cart is currently empty' %>
             </strong>
         </p>
     <% end_if %>
