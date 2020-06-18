@@ -8,7 +8,17 @@
 
 * Support for new OrderFactory
 
+
+## 1.1.1
+
+* Add additional extension hook to add to cart form
+
 ## 1.1.2
 
 * Minor ShoppingCartForm template updates
 * Update and fix unit tests
+* Minor updates
+
+## 1.1.3
+
+* Make postage and discount values render nicely in summary
