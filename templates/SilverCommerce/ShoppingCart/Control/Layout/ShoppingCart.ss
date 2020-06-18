@@ -70,7 +70,7 @@
                                 </strong>
                             </td>
                             <td class="text-right">
-                                {$PostagePrice}
+                                {$PostagePrice.Nice}
                             </td>
                         </tr>
                     <% end_if %>
