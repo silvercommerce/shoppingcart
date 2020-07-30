@@ -26,3 +26,7 @@
 ## 1.1.4
 
 * Ensure we show subtotal and tax when relevent siteconfig param is set
+
+## 1.1.5
+
+* Ensure subtotal is also removed when ShowPriceAndTax is set

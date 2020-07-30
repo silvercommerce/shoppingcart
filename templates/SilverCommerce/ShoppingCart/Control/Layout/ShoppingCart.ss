@@ -38,16 +38,18 @@
 
             <div class="unit size1of3 col-xs-12 col-lg-4">
                 <table class="shoppingcart-total-table table">
-                    <tr class="subtotal">
-                        <td class="text-right">
-                            <strong>
-                                <%t SilverCommerce\ShoppingCart.SubTotal 'Sub Total' %>
-                            </strong>
-                        </td>
-                        <td class="text-right">
-                            {$SubTotal.Nice}
-                        </td>
-                    </tr>
+                    <% if $ShowTax %>
+                        <tr class="subtotal">
+                            <td class="text-right">
+                                <strong>
+                                    <%t SilverCommerce\ShoppingCart.SubTotal 'Sub Total' %>
+                                </strong>
+                            </td>
+                            <td class="text-right">
+                                {$SubTotal.Nice}
+                            </td>
+                        </tr>
+                    <% end_if %>
                     
                     <% if $Discounts.exists %>
                         <tr class="discount">
