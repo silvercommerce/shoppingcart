@@ -348,15 +348,14 @@ class ShoppingCart extends Controller
     }
     
     /**
-     * Shortcut to checkout config, to allow us to access it via
-     * templates
+     * Should the purchase total show a breakdown of tax and subtotal?
      *
      * @return boolean
      */
     public function ShowTax()
     {
         $config = SiteConfig::current_site_config();
-        return $config->ShowPriceAndTax;
+        return !($config->ShowPriceAndTax);
     }
 
     /**
