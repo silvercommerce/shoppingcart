@@ -30,3 +30,7 @@
 ## 1.1.5
 
 * Ensure subtotal is also removed when ShowPriceAndTax is set
+
+## 1.2.0
+
+* Upgrade to newer discounts

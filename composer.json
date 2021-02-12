@@ -28,7 +28,7 @@
           "silverstripe/framework": "~4.0",
           "silvercommerce/settings": "~1.0",
           "silvercommerce/orders-admin": "~1.0",
-          "silvercommerce/discounts": "~1.0",
+          "silvercommerce/discounts": "~2.0",
           "silvercommerce/postage": "~1.0"
       },
       "require-dev": {
