@@ -2,11 +2,11 @@
 
 namespace SilverCommerce\ShoppingCart\Control;
 
+use Exception;
 use SilverStripe\i18n\i18n;
 use SilverStripe\Forms\Form;
 use SilverStripe\View\SSViewer;
 use SilverStripe\Forms\FieldList;
-use SilverStripe\Forms\TextField;
 use SilverStripe\Control\Director;
 use SilverStripe\Forms\FormAction;
 use SilverStripe\Control\Controller;
@@ -15,11 +15,8 @@ use SilverStripe\SiteConfig\SiteConfig;
 use SilverStripe\Core\Injector\Injector;
 use SilverStripe\Subsites\Model\Subsite;
 use SilverStripe\ORM\ValidationException;
-use SilverCommerce\Discounts\Model\Discount;
 use SilverCommerce\Checkout\Control\Checkout;
-use SilverCommerce\Discounts\DiscountFactory;
 use SilverCommerce\Postage\Forms\PostageForm;
-use SilverCommerce\OrdersAdmin\Model\Estimate;
 use SilverCommerce\Discounts\Model\AppliedDiscount;
 use SilverStripe\CMS\Controllers\ContentController;
 use SilverCommerce\Discounts\Forms\DiscountCodeForm;
@@ -306,7 +303,7 @@ class ShoppingCart extends Controller
             $code = $this->getDiscount();
         }
 
-        $this->extend("onBeforeUseDiscount");
+        $this->extend("onBeforeUseDiscount", $code);
 
         return $this
             ->customise([
