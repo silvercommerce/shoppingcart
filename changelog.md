@@ -30,3 +30,17 @@
 ## 1.1.5
 
 * Ensure subtotal is also removed when ShowPriceAndTax is set
+
+## 1.1.6
+
+* Fix auto redirect error
+* Make shopping cart controller more exensible 
+
+## 1.2.0
+
+* Update to work with newer discounts module
+
+## 1.2.1
+
+* Fix auto redirect error
+* Make shopping cart controller more exensible
