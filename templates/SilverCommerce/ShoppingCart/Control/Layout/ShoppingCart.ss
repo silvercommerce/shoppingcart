@@ -1,7 +1,7 @@
 <% require css('silvercommerce/shoppingcart: client/dist/css/shoppingcart.css') %>
 
 <div class="col-sm-12 content-container typography shoppingcart">
-    <h1><%t SilverCommerce\ShoppingCart.CartName 'Your Basket' %></h1>
+    <h1 class="text-center"><%t SilverCommerce\ShoppingCart.CartName 'Your Basket' %></h1>
 
     <% if $Items.exists %>
         <div class="row line">
@@ -110,7 +110,7 @@
             </div>
         </div>
     <% else %>
-        <p>
+        <p class="text-center alert alert-info mt-5 mb-5">
             <strong>
                 <%t SilverCommerce\ShoppingCart.CartIsEmpty 'Your basket is currently empty' %>
             </strong>
