@@ -2,6 +2,7 @@
 
 namespace SilverCommerce\ShoppingCart\Forms;
 
+use Exception;
 use SilverStripe\Forms\Form;
 use SilverStripe\Forms\FieldList;
 use SilverStripe\Forms\Validator;
@@ -14,6 +15,7 @@ use SilverStripe\Control\RequestHandler;
 use SilverCommerce\ShoppingCart\ShoppingCartFactory;
 use SilverCommerce\QuantityField\Forms\QuantityField;
 use SilverCommerce\ShoppingCart\Control\ShoppingCart;
+use SilverStripe\Core\Injector\Injector;
 
 /**
  * Form dedicated to adding the selected item to cart.
@@ -148,7 +150,8 @@ class AddToCartForm extends Form
         $classname = $data["ClassName"];
         $id = $data["ID"];
         $object = $classname::get()->byID($id);
-        $cart = ShoppingCartFactory::create();
+        $factory = ShoppingCartFactory::create();
+        $cart = Injector::inst()->get(ShoppingCart::class, true);
         $error = false;
         $redirect_to_cart = Config::inst()
             ->get(ShoppingCart::class, "redirect_on_add");
@@ -157,11 +160,11 @@ class AddToCartForm extends Form
             // Try and add item to cart, return any exceptions raised
             // as a message
             try {
-                $cart
+                $factory
                     ->addItem($object, $data['Quantity'])
                     ->write();
 
-                $this->extend('updateAddItemToCart', $item_to_add, $cart);
+                $this->extend('updateAddItemToCart', $item_to_add, $factory);
 
                 $message = _t(
                     'ShoppingCart.AddedItemToCart',
