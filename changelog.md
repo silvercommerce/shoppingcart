@@ -34,7 +34,8 @@
 ## 1.1.6
 
 * Fix auto redirect error
-* Make shopping cart controller more exensible 
+* Make shopping cart controller more exensible
+* Rename "cart" to "basket"
 
 ## 1.2.0
 
@@ -44,3 +45,4 @@
 
 * Fix auto redirect error
 * Make shopping cart controller more exensible
+* Rename "cart" to "basket"

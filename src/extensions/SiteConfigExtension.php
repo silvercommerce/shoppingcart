@@ -32,7 +32,7 @@ class SiteConfigExtension extends DataExtension
             "Root.Shop",
             ToggleCompositeField::create(
                 'ShoppingCartSettings',
-                _t("ShoppingCart.ShoppingCart", "Shopping Cart Settings"),
+                _t("ShoppingCart.ShoppingCartSettings", "Basket Settings"),
                 [
                     CheckboxField::create(
                         "ShowCartPostageForm",

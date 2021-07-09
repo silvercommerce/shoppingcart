@@ -54,7 +54,7 @@ class AddToCartForm extends Form
         $base_actions = FieldList::create(
             FormAction::create(
                 'doAddItemToCart',
-                _t('Catalogue.AddToCart', 'Add to Cart')
+                _t('Catalogue.AddToCart', 'Add to Basket')
             )->addExtraClass('btn btn-primary')
         );
 
@@ -168,7 +168,7 @@ class AddToCartForm extends Form
 
                 $message = _t(
                     'ShoppingCart.AddedItemToCart',
-                    'Added "{item}" to your shopping cart',
+                    'Added "{item}" to your basket',
                     ["item" => $object->Title]
                 );
 
@@ -185,7 +185,7 @@ class AddToCartForm extends Form
         } else {
             $error = true;
             $this->sessionMessage(
-                _t("ShoppingCart.ErrorAddingToCart", "Error adding item to cart")
+                _t("ShoppingCart.ErrorAddingToCart", "Error adding item to your basket")
             );
         }
 
