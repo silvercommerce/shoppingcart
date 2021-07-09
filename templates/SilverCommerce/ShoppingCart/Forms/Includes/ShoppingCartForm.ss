@@ -73,7 +73,7 @@
     <fieldset class="shoppingcart-actions Actions row justify-content-end">
 		<div class="btn-group justify-content-end d-flex col-md-6 align-self-end">
 			<a href="$Controller.Link('emptycart')" class="btn btn-outline-danger">
-				<%t ShoppingCart.CartEmpty "Empty Cart" %>
+				<%t ShoppingCart.CartEmpty "Empty Your Basket" %>
 			</a>
 			
 			$Actions.dataFieldByName(action_doUpdate).addExtraClass('btn btn-outline-info').removeExtraClass('btn-primary').Field

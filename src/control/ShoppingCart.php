@@ -136,7 +136,7 @@ class ShoppingCart extends Controller
         if ($this->config()->title) {
             return $this->config()->title;
         } else {
-            _t("SilverCommerce\ShoppingCart.CartName", "Shopping Cart");
+            _t("SilverCommerce\ShoppingCart.CartName", "Your Basket");
         }
     }
 
@@ -252,7 +252,7 @@ class ShoppingCart extends Controller
             $form = $this->CartForm();
             $form->sessionMessage(_t(
                 "ShoppingCart.RemovedItem",
-                "Removed '{title}' from your cart",
+                "Removed '{title}' from your basket",
                 ["title" => $title]
             ));
         }
@@ -271,7 +271,7 @@ class ShoppingCart extends Controller
         $form = $this->CartForm();
         $form->sessionMessage(_t(
             "ShoppingCart.EmptiedCart",
-            "Shopping cart emptied"
+            "Emptied Your Basket"
         ));
 
         return $this->redirectBack();
@@ -370,7 +370,7 @@ class ShoppingCart extends Controller
             FieldList::create(
                 FormAction::create(
                     'doUpdate',
-                    _t('ShoppingCart.UpdateCart', 'Update Cart')
+                    _t('ShoppingCart.UpdatedCart', 'Updated Your Basket')
                 )
             )
         )->setTemplate("SilverCommerce\ShoppingCart\Forms\Includes\ShoppingCartForm");
@@ -455,7 +455,7 @@ class ShoppingCart extends Controller
                             }
 
                             $form->sessionMessage(
-                                _t("ShoppingCart.UpdatedShoppingCart", "Shopping cart updated"),
+                                _t("ShoppingCart.UpdatedCart", "Updated Your Basket"),
                                 ValidationResult::TYPE_GOOD
                             );
                         }
