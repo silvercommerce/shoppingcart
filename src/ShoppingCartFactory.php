@@ -166,6 +166,8 @@ class ShoppingCartFactory extends OrderFactory
             }
         }
 
+        $cart->setAllowNegativeValue(false);
+
         return $cart;
     }
 

@@ -46,3 +46,8 @@
 * Fix auto redirect error
 * Make shopping cart controller more exensible
 * Rename "cart" to "basket"
+
+## 1.3.0
+
+* Disable negative order values
+* Code folder re-arrange
