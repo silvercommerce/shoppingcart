@@ -197,24 +197,6 @@ class ShoppingCart extends Controller
     }
 
     /**
-     * If content controller exists, return it's menu function
-     * @param int $level Menu level to return.
-     * @return ArrayList
-     */
-    public function getMenu($level = 1)
-    {
-        if (class_exists(ContentController::class)) {
-            $controller = ContentController::singleton();
-            return $controller->getMenu($level);
-        }
-    }
-
-    public function Menu($level)
-    {
-        return $this->getMenu();
-    }
-
-    /**
      * Default acton for the shopping cart
      */
     public function index()
@@ -349,7 +331,7 @@ class ShoppingCart extends Controller
      *
      * @return boolean
      */
-    public function ShowTax()
+    public function getShowTax()
     {
         $config = SiteConfig::current_site_config();
         return !($config->ShowPriceAndTax);

@@ -51,3 +51,4 @@
 
 * Disable negative order values
 * Code folder re-arrange
+* Clean up some uneeded methods
