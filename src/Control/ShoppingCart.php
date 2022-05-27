@@ -352,7 +352,7 @@ class ShoppingCart extends Controller
             FieldList::create(
                 FormAction::create(
                     'doUpdate',
-                    _t('ShoppingCart.UpdatedCart', 'Updated Your Basket')
+                    _t('ShoppingCart.UpdateCart', 'Update Basket')
                 )
             )
         )->setTemplate("SilverCommerce\ShoppingCart\Forms\Includes\ShoppingCartForm");

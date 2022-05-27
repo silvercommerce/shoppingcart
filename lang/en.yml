@@ -25,7 +25,7 @@ en:
     PLURALNAME: 'Order Notifications'
     SINGULARNAME: 'Order Notification'
   Orders:
-    AddToCart: 'Add to cart'
+    AddToCart: 'Add to basket'
     Address1: 'Address Line 1'
     Address2: 'Address Line 2'
     BillingDetails: 'Customer Details'
@@ -103,9 +103,9 @@ en:
     Addresses: Addresses
     Back: Back
     BillingDetails: 'Billing Details'
-    CartEmpty: 'Empty Cart'
-    CartIsEmpty: 'Your cart is currently empty'
-    CartName: 'Shopping Cart'
+    CartEmpty: 'Empty basket'
+    CartIsEmpty: 'Your basket is currently empty'
+    CartName: 'Shopping Basket'
     CartProceed: 'Proceed to Checkout'
     CartTotal: Total
     City: City
@@ -130,7 +130,7 @@ en:
     Edit: Edit
     EditAddress: 'Edit Address'
     Email: Email
-    EmptiedCart: 'Shopping cart emptied'
+    EmptiedCart: 'Shopping basket emptied'
     EnterDifferentAddress: 'Enter a different address'
     EnterDiscountCode: 'Enter a discount code'
     Error: 'There was an error'
@@ -160,7 +160,7 @@ en:
     RedirectingToStore: 'We are now redirecting you, if you are not redirected automatically then click the link below.'
     Register: Register
     Remove: Remove
-    RemovedItem: 'Removed ''{title}'' from your cart'
+    RemovedItem: 'Removed ''{title}'' from your basket'
     Save: Save
     SaveAddress: 'Save this address for later'
     Search: Search
@@ -179,11 +179,11 @@ en:
     ThankYouForOrder: 'Thank you for your order'
     Total: Total
     Update: Update
-    UpdateCart: 'Update Cart'
-    UpdatedShoppingCart: 'Shopping cart updated'
+    UpdateCart: 'Update Basket'
+    UpdatedShoppingCart: 'Shopping basket updated'
     UseBillingSavedAddress: 'Use a saved billing address'
     UseThisAddress: 'Use this address'
-    ViewCart: 'View Cart'
+    ViewCart: 'View basket'
     YourAddresses: 'Your Addresses'
     ZipCode: 'Zip/Postal Code'
   CheckoutAdmin:
