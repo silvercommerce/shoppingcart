@@ -161,6 +161,7 @@ class AddToCartForm extends Form
             // as a message
             try {
                 $factory
+                    ->setExtraData($data)
                     ->addItem($object, $data['Quantity'])
                     ->write();
 
