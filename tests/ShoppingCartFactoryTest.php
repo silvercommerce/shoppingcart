@@ -28,7 +28,7 @@ class ShoppingCartFactoryTest extends SapphireTest
         TestProduct::class
     ];
 
-    public function setUp()
+    public function setUp(): void
     {
         // Ensure we setup a session and the current request
         $request = new HTTPRequest('GET', '/');

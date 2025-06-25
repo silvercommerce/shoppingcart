@@ -18,18 +18,9 @@ use SilverStripe\ORM\ValidationException;
 use SilverCommerce\Checkout\Control\Checkout;
 use SilverCommerce\Postage\Forms\PostageForm;
 use SilverCommerce\Discounts\Model\AppliedDiscount;
-use SilverStripe\CMS\Controllers\ContentController;
 use SilverCommerce\Discounts\Forms\DiscountCodeForm;
 use SilverCommerce\ShoppingCart\ShoppingCartFactory;
 
-/**
- * Holder for items in the shopping cart and interacting with them, as
- * well as rendering these items into an interface that allows editing
- * of items,
- *
- * @author ilateral (http://www.ilateral.co.uk)
- * @package shoppingcart
- */
 class ShoppingCart extends Controller
 {
 

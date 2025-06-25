@@ -13,28 +13,25 @@
       "license": "BSD-3-Clause",
       "authors": [
           {
-              "name": "Morven Lewis-Everley",
-              "email": "morven@ilateral.co.uk"
-          },
-          {
-              "name": "Mark Anderson",
-              "email": "mark@ilateral.co.uk"
+              "name": "Dean Forest Tech",
+              "homepage": "https://dean-forest-tech.uk"
           }
       ],
       "support": {
           "issues": "http://github.com/silvercommerce/shoppingcart/issues"
       },
       "require": {
-          "silverstripe/framework": "~4.0",
-          "silvercommerce/settings": "~1.0",
+          "silverstripe/framework": "^4 || ^5",
+          "silvercommerce/settings": "^1",
           "silvercommerce/orders-admin": "^1.5",
-          "silvercommerce/discounts": "~2.0",
-          "silvercommerce/postage": "~1.0"
+          "silvercommerce/discounts": "^2.0",
+          "silvercommerce/postage": "^1"
       },
       "require-dev": {
-        "silvercommerce/catalogue-admin": "^1.0",
-        "silvercommerce/tax-admin": "^1.0",
-        "phpunit/phpunit": "^5.7",
+        "silverstripe/framework": "^5",
+        "silvercommerce/catalogue-admin": "^1",
+        "silvercommerce/tax-admin": "^1",
+        "phpunit/phpunit": "^9.2",
         "squizlabs/php_codesniffer": "^3.0"
       },
       "extra": {

@@ -21,7 +21,7 @@ class ShoppingCart extends Estimate
      * @param string $action The action you want to add to the link
      * @return string
      */
-    public function Link($action = null)
+    public function Link(string $action = "")
     {
         $controller = Injector::inst()->create(ShoppingCartController::class);
         return $controller->Link($action);
@@ -33,7 +33,7 @@ class ShoppingCart extends Estimate
      * @param string $action The action you want to add to the link
      * @return string
      */
-    public function AbsoluteLink($action = null)
+    public function AbsoluteLink(string $action = "")
     {
         return Director::absoluteURL($this->Link($action));
     }
@@ -45,7 +45,7 @@ class ShoppingCart extends Estimate
      * @param string $action The action you want to add to the link
      * @return string
      */
-    public function RelativeLink($action = null)
+    public function RelativeLink(string $action = "")
     {
         return Controller::join_links(
             Director::baseURL(),
