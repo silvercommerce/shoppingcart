@@ -20,7 +20,6 @@ use SilverCommerce\Postage\Forms\PostageForm;
 use SilverCommerce\Discounts\Model\AppliedDiscount;
 use SilverCommerce\Discounts\Forms\DiscountCodeForm;
 use SilverCommerce\ShoppingCart\ShoppingCartFactory;
-use SilverStripe\Dev\Deprecation;
 
 class ShoppingCart extends Controller
 {
@@ -358,30 +357,21 @@ class ShoppingCart extends Controller
      * Form that allows you to add a discount code which then gets added
      * to the cart's list of discounts.
      *
-     * @return DiscountCodeForm
+     * @return Form
      */
-    public function DiscountCodeForm(): DiscountCodeForm
+    public function DiscountForm()
     {
         $form = DiscountCodeForm::create(
             $this,
+            "DiscountForm",
             ShoppingCartFactory::create()->getOrder()
         );
         
-        $this->extend("updateDiscountCodeForm", $form);
+        $this->extend("updateDiscountForm", $form);
         
         return $form;
     }
-
-    public function DiscountForm()
-    {
-        Deprecation::notice(
-            "1.3.0",
-            "DiscountForm deprecated, use DiscountCodeForm instead"
-        );
-
-        return $this->DiscountCodeForm();
-    }
-
+    
     /**
      * Form responsible for estimating shipping based on location and
      * postal code

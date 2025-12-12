@@ -15,7 +15,7 @@
                 <div class="row">
                     <% if $SiteConfig.ShowCartDiscountForm %>
                         <div class="checkout-cart-discounts unit col-xs-12 col-lg-6">
-                            {$DiscountCodeForm}
+                            $DiscountForm
 
                             <% loop $Discounts %>
                                 <ul class="list-unstyled">

@@ -53,5 +53,3 @@
 * Code folder re-arrange
 * Clean up some uneeded methods
 * SS5 support
-* PHP 8.* fixes
-* Depretiate `DiscountForm` in favour of `DiscountCodeForm`
